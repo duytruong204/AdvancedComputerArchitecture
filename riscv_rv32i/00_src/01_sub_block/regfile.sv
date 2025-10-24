@@ -1,16 +1,16 @@
 module regfile(
-	input wire 				i_clk,
-	input wire				i_reset, 
-	input wire	[4:0]		i_rs1_addr,
-	input wire 	[4:0]		i_rs2_addr,
+	input  wire 		i_clk,
+	input  wire			i_reset, 
+	input  wire	[4:0]	i_rs1_addr,
+	input  wire [4:0]	i_rs2_addr,
 	output wire [31:0]	o_rs1_data,
 	output wire	[31:0]	o_rs2_data,
-	input wire	[4:0]		i_rd_addr,
-	input wire 	[31:0]	i_rd_data,
-	input wire				i_rd_wren
+	input  wire	[4:0]	i_rd_addr,
+	input  wire [31:0]	i_rd_data,
+	input  wire			i_rd_wren
 );
-	wire 			[31:0] 	w_registers [31:0];
-	wire			[31:0]   w_write_addr_onehot;
+	wire 		[31:0] 	w_registers [31:0];
+	wire		[31:0]  w_write_addr_onehot;
 	
 	binary_to_onehot_32bit bin2hot (
 		.i_in(i_rd_addr), 
@@ -26,8 +26,8 @@ module regfile(
 		.o_registers(w_registers)
 	);
 
-	mux_32to1_register32bit 	 mux_rs1(.i_registers(w_registers), .i_sel(i_rs1_addr), .o_out(o_rs1_data));
-	mux_32to1_register32bit 	 mux_rs2(.i_registers(w_registers), .i_sel(i_rs2_addr), .o_out(o_rs2_data));
+	mux_32to1_register32bit mux_rs1(.i_registers(w_registers), .i_sel(i_rs1_addr), .o_out(o_rs1_data));
+	mux_32to1_register32bit mux_rs2(.i_registers(w_registers), .i_sel(i_rs2_addr), .o_out(o_rs2_data));
 	
 endmodule
 
@@ -48,12 +48,12 @@ module d_flip_flop_32bit(
 endmodule
 
 module d_flip_flop_32x32bit (
-	input  wire 			i_clk,
-	input  wire 			i_reset,
-	input  wire 			i_write_enable,
+	input  wire 		i_clk,
+	input  wire 		i_reset,
+	input  wire 		i_write_enable,
 	input  wire [31:0] 	i_write_data,
 	input  wire [31:0] 	i_write_addr_onehot, // onehot encoded
-	output wire [31:0]  	o_registers [0:31]
+	output wire [31:0]  o_registers [0:31]
 );
 	
 	wire [31:0] w_next_data [0:31];

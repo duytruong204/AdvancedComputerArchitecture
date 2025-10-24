@@ -1,16 +1,16 @@
 module alu (
-	input	wire [31:0] i_op_a, 		//32 input First operand for ALU operations.
-	input	wire [31:0] i_op_b, 		//32 input Second operand for ALU operations.
-	input	wire [3:0]  i_alu_op, 	//4 input The operation to be performed.
-	output wire[31:0] o_alu_data 	//32 output Result of the ALU operation.
+	input  wire [31:0] i_op_a, 		//32 input First operand for ALU operations.
+	input  wire [31:0] i_op_b, 		//32 input Second operand for ALU operations.
+	input  wire [3:0]  i_alu_op, 	//4 input The operation to be performed.
+	output wire [31:0] o_alu_data 	//32 output Result of the ALU operation.
 );
-	wire  [31:0] w_add_result, w_sub_result;
-	wire			 w_slt_result_1bit, w_sltu_result_1bit;
-	wire	[31:0] w_slt_result, w_sltu_result;
-	wire	[31:0] w_xor_result, w_or_result, w_and_result;
-	wire	[31:0] w_sll_result, w_srl_result, w_sra_result;
+	wire  [31:0]	w_add_result, w_sub_result;
+	wire			w_slt_result_1bit, w_sltu_result_1bit;
+	wire  [31:0] 	w_slt_result, w_sltu_result;
+	wire  [31:0] 	w_xor_result, w_or_result, w_and_result;
+	wire  [31:0] 	w_sll_result, w_srl_result, w_sra_result;
 	
-	full_adder_32bit 	add(
+	full_adder_32bit add(
 		.i_a(i_op_a),
 		.i_b(i_op_b),
 		.i_carry(1'b0),
@@ -18,7 +18,7 @@ module alu (
 		.o_carry()
 	);
 	
-	full_adder_32bit 	sub(
+	full_adder_32bit sub(
 		.i_a(i_op_a),
 		.i_b(~i_op_b),
 		.i_carry(1'b1),
@@ -91,7 +91,7 @@ module alu (
 		.i_in11(32'b0),			//1 		- 011		: unused
 		.i_in12(32'b0),			//1 		- 100		: unused
 		.i_in13(w_sra_result),	//1 		- 101		: SRA
-		.i_in14(32'b0), 			//1 		- 110		: unused
+		.i_in14(32'b0), 		//1 		- 110		: unused
 		.i_in15(i_op_b),  		//1 		- 111		: B (return i_op_b)
 		.i_sel(i_alu_op), 
 		.o_out(o_alu_data)

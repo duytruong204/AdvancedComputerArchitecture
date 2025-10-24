@@ -18,7 +18,7 @@ module slt_32bit (
 	);
 
 	// Check if signs of A and B are different
-    	assign w_sign_compare = i_a[31] ^ i_b[31];
+    assign w_sign_compare = i_a[31] ^ i_b[31];
 
 	// If signs differ, result depends on sign of A
 	// If signs are the same, use sign of (A - B)

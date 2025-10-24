@@ -8,10 +8,10 @@ module srl_32bit (
 
     wire [31:0] w_mux1_out, w_mux2_out, w_mux3_out, w_mux4_out;
 
-    mux_2to1_32bit mux_1 (.i_in0(i_a),        .i_in1({1'b0,      i_a[31:1]}),      .i_sel(i_b[0]), .o_out(w_mux1_out));  // shift by 1
-    mux_2to1_32bit mux_2 (.i_in0(w_mux1_out), .i_in1({2'b0,      w_mux1_out[31:2]}), .i_sel(i_b[1]), .o_out(w_mux2_out));  // shift by 2
-    mux_2to1_32bit mux_3 (.i_in0(w_mux2_out), .i_in1({4'b0,      w_mux2_out[31:4]}), .i_sel(i_b[2]), .o_out(w_mux3_out));  // shift by 4
-    mux_2to1_32bit mux_4 (.i_in0(w_mux3_out), .i_in1({8'b0,      w_mux3_out[31:8]}), .i_sel(i_b[3]), .o_out(w_mux4_out));  // shift by 8
-    mux_2to1_32bit mux_5 (.i_in0(w_mux4_out), .i_in1({16'b0,     w_mux4_out[31:16]}),.i_sel(i_b[4]), .o_out(o_out));       // shift by 16
+    mux_2to1_32bit mux_1 (.i_in0(i_a),        .i_in1({1'b0, i_a[31:1]}),        .i_sel(i_b[0]), .o_out(w_mux1_out));  // shift by 1
+    mux_2to1_32bit mux_2 (.i_in0(w_mux1_out), .i_in1({2'b0, w_mux1_out[31:2]}), .i_sel(i_b[1]), .o_out(w_mux2_out));  // shift by 2
+    mux_2to1_32bit mux_3 (.i_in0(w_mux2_out), .i_in1({4'b0, w_mux2_out[31:4]}), .i_sel(i_b[2]), .o_out(w_mux3_out));  // shift by 4
+    mux_2to1_32bit mux_4 (.i_in0(w_mux3_out), .i_in1({8'b0, w_mux3_out[31:8]}), .i_sel(i_b[3]), .o_out(w_mux4_out));  // shift by 8
+    mux_2to1_32bit mux_5 (.i_in0(w_mux4_out), .i_in1({16'b0,w_mux4_out[31:16]}),.i_sel(i_b[4]), .o_out(o_out));       // shift by 16
 
 endmodule

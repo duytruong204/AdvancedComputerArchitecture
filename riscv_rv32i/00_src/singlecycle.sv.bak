@@ -1,4 +1,4 @@
-`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/include.sv"
+`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/milestone2_ver1/00_src/00_common/include.sv"
 module singlecycle(
 	input  wire 			i_clk,
 	input  wire 			i_reset,

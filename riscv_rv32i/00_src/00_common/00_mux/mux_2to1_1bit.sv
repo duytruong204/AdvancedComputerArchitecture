@@ -9,5 +9,5 @@ module mux_2to1_1bit (
 
 );
 	assign o_out = 	(~i_sel & i_in0) | // 0 
-			( i_sel & i_in1);  // 1
+					( i_sel & i_in1);  // 1
 endmodule

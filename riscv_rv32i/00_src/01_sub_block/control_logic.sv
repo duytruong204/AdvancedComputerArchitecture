@@ -1,17 +1,17 @@
 module control_logic(
 	input  wire [31:0]	i_inst,
-	input	 wire				i_br_lt, i_br_eq,
-	output wire 			o_br_un, 			//0: Signed; 1: Unsigned
-	output wire 			o_pc_sel, 			// 0: +4 ; 	1: ALU
+	input  wire			i_br_lt, i_br_eq,
+	output wire 		o_br_un, 			//0: Signed; 1: Unsigned
+	output wire 		o_pc_sel, 			// 0: +4 ; 	1: ALU
 	output wire [4:0] 	o_imm_sel,			// I:00001, S:00010, B:00100, J:01000, U: 10000
-	output wire				o_rd_wren,			// 0: Read; 1: Write
-	output wire				o_insn_vld,			// For test
-	output wire				o_opa_sel, 			//0: Reg; 1: PC
-	output wire				o_opb_sel,			//0: Reg; 1: Imm
+	output wire			o_rd_wren,			// 0: Read; 1: Write
+	output wire			o_insn_vld,			// For test
+	output wire			o_opa_sel, 			//0: Reg; 1: PC
+	output wire			o_opb_sel,			//0: Reg; 1: Imm
 	output wire [3:0] 	o_alu_op, 			//0000: Add; 1000: Sub;....
 	output wire [2:0] 	o_type_access,		//LB, LH, LBU, LHU, SW
-	output wire 			o_mem_rw,			//0: Read; 1: Write
-	output wire [1:0] 	o_wb_sel				//00: MemRW; 01: ALU; 10: PC
+	output wire 		o_mem_rw,			//0: Read; 1: Write
+	output wire [1:0] 	o_wb_sel			//00: MemRW; 01: ALU; 10: PC
 );
 	wire 			w_funct7 = i_inst[30];
 	wire [2:0]	w_funct3 = i_inst[14:12];
@@ -19,12 +19,12 @@ module control_logic(
 	wire 			w_r_type = ~w_opcode[4] &  w_opcode[3] &  w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 01100
 	wire 			w_i_type = ~w_opcode[4] & ~w_opcode[3] &  w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 00100
 	wire 			w_load   = ~w_opcode[4] & ~w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 00000
-   wire 			w_store  = ~w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 01000
-   wire 			w_branch =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 11000
-   wire 			w_jalr   =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] &  w_opcode[0]; // 11001
-   wire 			w_jal    =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] &  w_opcode[1] &  w_opcode[0]; // 11011
-   wire 			w_lui    = ~w_opcode[4] &  w_opcode[3] &  w_opcode[2] & ~w_opcode[1] &  w_opcode[0]; // 01101
-   wire 			w_auipc  = ~w_opcode[4] & ~w_opcode[3] &  w_opcode[2] & ~w_opcode[1] &  w_opcode[0]; // 00101
+	wire 			w_store  = ~w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 01000
+	wire 			w_branch =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 11000
+	wire 			w_jalr   =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] &  w_opcode[0]; // 11001
+	wire 			w_jal    =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] &  w_opcode[1] &  w_opcode[0]; // 11011
+	wire 			w_lui    = ~w_opcode[4] &  w_opcode[3] &  w_opcode[2] & ~w_opcode[1] &  w_opcode[0]; // 01101
+	wire 			w_auipc  = ~w_opcode[4] & ~w_opcode[3] &  w_opcode[2] & ~w_opcode[1] &  w_opcode[0]; // 00101
 	
 	// === Instruction Valid ===
 	assign o_insn_vld = w_r_type | w_i_type | w_load | w_store | w_branch | w_jal | w_jalr | w_lui | w_auipc;

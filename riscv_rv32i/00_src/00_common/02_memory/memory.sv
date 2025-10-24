@@ -5,7 +5,7 @@ module memory #(
 )(
 	input  wire                     i_clk,        // Clock
 	input  wire                     i_reset,      // Active-low synchronous reset
-	input  wire [$clog2(N)-1:0]     i_addr,       // Byte address (for both read/write)
+	input  wire [$clog2(N)-1:0]		i_addr,       // Byte address (for both read/write)
 	input  wire [3:0]               i_bmask,      // Byte mask (1 = enable write)
 	input  wire [31:0]              i_wdata,      // Write data
 	input  wire                     i_wren,       // Write enable
@@ -25,16 +25,16 @@ module memory #(
 			end
 		end else if (i_wren) begin
 			if (i_bmask[0] && (i_addr + 0) < N) r_mem[i_addr + 0] <= i_wdata[7:0];
-            		if (i_bmask[1] && (i_addr + 1) < N) r_mem[i_addr + 1] <= i_wdata[15:8];
-           		if (i_bmask[2] && (i_addr + 2) < N) r_mem[i_addr + 2] <= i_wdata[23:16];
-            		if (i_bmask[3] && (i_addr + 3) < N) r_mem[i_addr + 3] <= i_wdata[31:24];
+            if (i_bmask[1] && (i_addr + 1) < N) r_mem[i_addr + 1] <= i_wdata[15:8];
+           	if (i_bmask[2] && (i_addr + 2) < N) r_mem[i_addr + 2] <= i_wdata[23:16];
+            if (i_bmask[3] && (i_addr + 3) < N) r_mem[i_addr + 3] <= i_wdata[31:24];
 		end
 	end
 
 	// Combinational read logic
 	assign o_rdata[7:0]   = (i_addr + 0 < N) ? r_mem[i_addr + 0] : 8'h00;
 	assign o_rdata[15:8]  = (i_addr + 1 < N) ? r_mem[i_addr + 1] : 8'h00;
-    	assign o_rdata[23:16] = (i_addr + 2 < N) ? r_mem[i_addr + 2] : 8'h00;
-    	assign o_rdata[31:24] = (i_addr + 3 < N) ? r_mem[i_addr + 3] : 8'h00;
+    assign o_rdata[23:16] = (i_addr + 2 < N) ? r_mem[i_addr + 2] : 8'h00;
+    assign o_rdata[31:24] = (i_addr + 3 < N) ? r_mem[i_addr + 3] : 8'h00;
 
 endmodule
