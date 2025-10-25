@@ -11,7 +11,7 @@ module singlecycle_tb(
 	output wire 			o_insn_vld;
 
 	// Instantiate DUT
-	single_cycle singlecycle (
+	singlecycle singlecycle (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.o_pc_debug(o_pc_debug),

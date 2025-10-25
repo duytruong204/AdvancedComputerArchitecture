@@ -15,7 +15,7 @@ module inst_mem #(
 
 	// Load instructions from memory file during simulation
 	initial begin
-		$readmemh("D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/02_test/imem.hex", r_imem);
+		$readmemh("D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/02_test/00_self_test/imem.hex", r_imem);
 	end
 
 	// Word-aligned access (ignores lowest 2 bits of address)

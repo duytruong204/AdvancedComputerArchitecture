@@ -185,6 +185,7 @@ module ouput_peripheral_memory(
 	wire [31:0] 	w_hexl_data;
 	wire [31:0] 	w_ledg_data;
 	wire [31:0] 	w_ledr_data;
+
 	//RV32I provides a 32-bit address space that is byte-addressed.
 	// Other peripheral device with write by i_wdata
 	memory #(.N(4096)) lcd_control_register (
@@ -197,7 +198,6 @@ module ouput_peripheral_memory(
 		.o_rdata(w_lcd_data)
 	);
 	d_latch_32bit lcd_control_latch (
-		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(i_lcd_enable & i_lsu_wren),
 		.i_d(w_lcd_data),
@@ -214,7 +214,6 @@ module ouput_peripheral_memory(
 		.o_rdata(w_hexh_data)
 	);
 	d_latch_32bit seven_segment_leds_7to4_latch (
-		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(i_hexh_enable & i_lsu_wren),
 		.i_d(w_hexh_data),
@@ -231,7 +230,6 @@ module ouput_peripheral_memory(
 		.o_rdata(w_hexl_data)
 	);
 	d_latch_32bit seven_segment_leds_3to0_latch (
-		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(i_hexl_enable & i_lsu_wren),
 		.i_d(w_hexl_data),
@@ -249,7 +247,6 @@ module ouput_peripheral_memory(
 	);
 
 	d_latch_32bit green_leds_latch (
-		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(i_ledg_enable & i_lsu_wren),
 		.i_d(w_ledg_data),
@@ -267,11 +264,10 @@ module ouput_peripheral_memory(
 	);
 
 	d_latch_32bit red_leds_latch (
-		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(i_ledr_enable & i_lsu_wren),
-		.i_d(o_ledr_out),
-		.o_q(w_ledr_data)
+		.i_d(w_ledr_data),
+		.o_q(o_ledr_out)
 	);
 
 endmodule
@@ -301,13 +297,12 @@ module input_peripheral_memory(
 endmodule
 
 module d_latch_32bit(
-	input  wire 		i_clk,
 	input  wire 		i_reset,
 	input  wire 		i_en,
 	input  wire [31:0] 	i_d,
 	output reg  [31:0] 	o_q
 );
-	always @(posedge i_clk or negedge i_reset) begin
+	always @(*) begin
 		if(!i_reset) begin
 			o_q <= 32'b0;
 		end else if(i_en) begin
