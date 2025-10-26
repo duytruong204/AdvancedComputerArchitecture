@@ -13,7 +13,8 @@ module lsu(
 	input  wire	[31:0]	i_io_sw
 );
 	wire 		w_sw_enable,	w_lcd_enable,	w_hexh_enable,	w_hexl_enable,	w_ledg_enable, w_ledr_enable, w_mem_enable;
-	wire [31:0] w_sw_out, 		w_lcd_out, 		w_hexh_out, 	w_hexl_out, 	w_ledg_out, 	w_ledr_out, 	w_mem_out;
+	wire [31:0] 				w_lcd_out, 		w_hexh_out, 	w_hexl_out, 	w_ledg_out, 	w_ledr_out;
+	wire [31:0] w_sw_data, 		w_lcd_data, 	w_hexh_data, 	w_hexl_data, 	w_ledg_data, 	w_ledr_data, 	w_mem_data;
 	wire [11:0] w_peripheral_addr;
 	wire [10:0] w_memory_addr;
 	wire [31:0] w_output_data;
@@ -40,7 +41,7 @@ module lsu(
 		.i_memory_addr(w_memory_addr),
 		.i_write_data(i_st_data),
 		.i_mem_enable(w_mem_enable),
-		.o_mem_out(w_mem_out)
+		.o_mem_data(w_mem_data)
 	);
 	
 	ouput_peripheral_memory ouput_peripheral_memory (
@@ -55,6 +56,11 @@ module lsu(
 		.i_hexl_enable(w_hexl_enable),
 		.i_ledg_enable(w_ledg_enable),
 		.i_ledr_enable(w_ledr_enable),
+		.o_lcd_data(w_lcd_data),
+		.o_hexh_data(w_hexh_data),
+		.o_hexl_data(w_hexl_data),
+		.o_ledg_data(w_ledg_data),
+		.o_ledr_data(w_ledr_data),
 		.o_lcd_out(w_lcd_out),
 		.o_hexh_out(w_hexh_out),
 		.o_hexl_out(w_hexl_out),
@@ -74,16 +80,16 @@ module lsu(
 	assign o_io_hex6 = w_hexh_out[22:16];
 	assign o_io_hex7 = w_hexh_out[30:24];
 	
-	input_peripheral_memory input_peripheral_memory (
-		.i_clk(i_clk),
-		.i_reset(i_reset),
-		.i_lsu_wren(i_lsu_wren),
-		.i_bmask(w_bmask),
-		.i_peripheral_addr(w_peripheral_addr),
-		.i_io_sw(i_io_sw),
-		.i_sw_enable(w_sw_enable),
-		.o_sw_out(w_sw_out)
-	);
+	// input_peripheral_memory input_peripheral_memory (
+	// 	.i_clk(i_clk),
+	// 	.i_reset(i_reset),
+	// 	.i_lsu_wren(i_lsu_wren),
+	// 	.i_bmask(w_bmask),
+	// 	.i_peripheral_addr(w_peripheral_addr),
+	// 	.i_io_sw(i_io_sw),
+	// 	.i_sw_enable(w_sw_enable),
+	// 	.o_sw_data(w_sw_data)
+	// );
 	
 	mux_by_enable_32bit mux_by_enable_32bit(
 		.i_sw_enable(w_sw_enable),
@@ -93,13 +99,13 @@ module lsu(
 		.i_ledg_enable(w_ledg_enable),
 		.i_ledr_enable(w_ledr_enable),
 		.i_mem_enable(w_mem_enable),
-		.i_sw_out(w_sw_out),
-		.i_lcd_out(w_lcd_out),
-		.i_hexh_out(w_hexh_out),
-		.i_hexl_out(w_hexl_out),
-		.i_ledg_out(w_ledg_out),
-		.i_ledr_out(w_ledr_out),
-		.i_mem_out(w_mem_out),
+		.i_sw_data(i_io_sw),
+		.i_lcd_data(w_lcd_data),
+		.i_hexh_data(w_hexh_data),
+		.i_hexl_data(w_hexl_data),
+		.i_ledg_data(w_ledg_data),
+		.i_ledr_data(w_ledr_data),
+		.i_mem_data(w_mem_data),
 		.o_output_data(w_output_data)
 	);
 	
@@ -147,7 +153,7 @@ module internal_memory (
 	input  wire [10:0]  i_memory_addr,
 	input  wire [31:0] 	i_write_data,
 	input  wire 		i_mem_enable,
-	output wire [31:0] 	o_mem_out
+	output wire [31:0] 	o_mem_data
 );
 	//RV32I provides a 32-bit address space that is byte-addressed.
 	memory #(.N(2048)) internal_memory (
@@ -157,7 +163,7 @@ module internal_memory (
 		.i_bmask(i_bmask),
 		.i_wren(i_mem_enable & i_lsu_wren), 
 		.i_wdata(i_write_data),
-		.o_rdata(o_mem_out)
+		.o_rdata(o_mem_data)
 	);
 
 endmodule
@@ -174,17 +180,17 @@ module ouput_peripheral_memory(
 	input  wire 		i_hexl_enable,
 	input  wire 		i_ledg_enable,
 	input  wire 		i_ledr_enable,
+	output wire [31:0] 	o_lcd_data,
+	output wire [31:0] 	o_hexh_data,
+	output wire [31:0] 	o_hexl_data,
+	output wire [31:0] 	o_ledg_data,
+	output wire [31:0] 	o_ledr_data,
 	output wire [31:0] 	o_lcd_out,
 	output wire [31:0] 	o_hexh_out,
 	output wire [31:0] 	o_hexl_out,
 	output wire [31:0] 	o_ledg_out,
 	output wire [31:0] 	o_ledr_out
 );
-	wire [31:0] 	w_lcd_data;
-	wire [31:0] 	w_hexh_data;
-	wire [31:0] 	w_hexl_data;
-	wire [31:0] 	w_ledg_data;
-	wire [31:0] 	w_ledr_data;
 
 	//RV32I provides a 32-bit address space that is byte-addressed.
 	// Other peripheral device with write by i_wdata
@@ -195,12 +201,12 @@ module ouput_peripheral_memory(
 		.i_bmask(i_bmask),
 		.i_wren(i_lcd_enable & i_lsu_wren),
 		.i_wdata(i_write_data),
-		.o_rdata(w_lcd_data)
+		.o_rdata(o_lcd_data)
 	);
 	d_latch_32bit lcd_control_latch (
 		.i_reset(i_reset),
 		.i_en(i_lcd_enable & i_lsu_wren),
-		.i_d(w_lcd_data),
+		.i_d(o_lcd_data),
 		.o_q(o_lcd_out)
 	);
 
@@ -216,7 +222,7 @@ module ouput_peripheral_memory(
 	d_latch_32bit seven_segment_leds_7to4_latch (
 		.i_reset(i_reset),
 		.i_en(i_hexh_enable & i_lsu_wren),
-		.i_d(w_hexh_data),
+		.i_d(o_hexh_data),
 		.o_q(o_hexh_out)
 	);
 
@@ -227,12 +233,12 @@ module ouput_peripheral_memory(
 		.i_bmask(i_bmask),
 		.i_wren(i_hexl_enable & i_lsu_wren),
 		.i_wdata(i_write_data),
-		.o_rdata(w_hexl_data)
+		.o_rdata(o_hexl_data)
 	);
 	d_latch_32bit seven_segment_leds_3to0_latch (
 		.i_reset(i_reset),
 		.i_en(i_hexl_enable & i_lsu_wren),
-		.i_d(w_hexl_data),
+		.i_d(o_hexl_data),
 		.o_q(o_hexl_out)
 	);
 
@@ -243,13 +249,13 @@ module ouput_peripheral_memory(
 		.i_bmask(i_bmask),
 		.i_wren(i_ledg_enable & i_lsu_wren),
 		.i_wdata(i_write_data),
-		.o_rdata(w_ledg_data)
+		.o_rdata(o_ledg_data)
 	);
 
 	d_latch_32bit green_leds_latch (
 		.i_reset(i_reset),
 		.i_en(i_ledg_enable & i_lsu_wren),
-		.i_d(w_ledg_data),
+		.i_d(o_ledg_data),
 		.o_q(o_ledg_out)
 	);
 
@@ -260,13 +266,13 @@ module ouput_peripheral_memory(
 		.i_bmask(i_bmask),
 		.i_wren(i_ledr_enable & i_lsu_wren),
 		.i_wdata(i_write_data),
-		.o_rdata(w_ledr_data)
+		.o_rdata(o_ledr_data)
 	);
 
 	d_latch_32bit red_leds_latch (
 		.i_reset(i_reset),
 		.i_en(i_ledr_enable & i_lsu_wren),
-		.i_d(w_ledr_data),
+		.i_d(o_ledr_data),
 		.o_q(o_ledr_out)
 	);
 
@@ -280,7 +286,7 @@ module input_peripheral_memory(
 	input  wire [11:0] 	i_peripheral_addr,
 	input  wire [31:0] 	i_io_sw,
 	input  wire 		i_sw_enable,
-	output wire [31:0] 	o_sw_out
+	output wire [31:0] 	o_sw_data
 );
 	//RV32I provides a 32-bit address space that is byte-addressed.
 	// Switch will write by SW device (i_io_sw)
@@ -291,7 +297,7 @@ module input_peripheral_memory(
 		.i_bmask(i_bmask),
 		.i_wren(i_sw_enable & i_lsu_wren),
 		.i_wdata(i_io_sw),
-		.o_rdata(o_sw_out)
+		.o_rdata(o_sw_data)
 	);
 
 endmodule
@@ -319,24 +325,24 @@ module mux_by_enable_32bit(
 	input  wire 		i_ledg_enable,
 	input  wire 		i_ledr_enable,
 	input  wire 		i_mem_enable,
-	input  wire [31:0] 	i_sw_out,
-	input  wire [31:0] 	i_lcd_out,
-	input  wire [31:0] 	i_hexh_out,
-	input  wire [31:0] 	i_hexl_out,
-	input  wire [31:0] 	i_ledg_out,
-	input  wire [31:0] 	i_ledr_out,
-	input  wire [31:0] 	i_mem_out,
+	input  wire [31:0] 	i_sw_data,
+	input  wire [31:0] 	i_lcd_data,
+	input  wire [31:0] 	i_hexh_data,
+	input  wire [31:0] 	i_hexl_data,
+	input  wire [31:0] 	i_ledg_data,
+	input  wire [31:0] 	i_ledr_data,
+	input  wire [31:0] 	i_mem_data,
 	output wire [31:0] 	o_output_data
 );
 
 	wire [31:0] w_mux1_out, w_mux2_out, w_mux3_out, w_mux4_out, w_mux5_out, w_mux6_out;
-	mux_2to1_32bit mux1 (.i_in0(32'b0)		 , .i_in1(i_sw_out), 	.i_sel(i_sw_enable), 	.o_out(w_mux1_out));
-	mux_2to1_32bit mux2 (.i_in0(w_mux1_out) , .i_in1(i_lcd_out), 	.i_sel(i_lcd_enable), 	.o_out(w_mux2_out));
-	mux_2to1_32bit mux3 (.i_in0(w_mux2_out) , .i_in1(i_hexh_out), 	.i_sel(i_hexh_enable), 	.o_out(w_mux3_out));
-	mux_2to1_32bit mux4 (.i_in0(w_mux3_out) , .i_in1(i_hexl_out), 	.i_sel(i_hexl_enable), 	.o_out(w_mux4_out));
-	mux_2to1_32bit mux5 (.i_in0(w_mux4_out) , .i_in1(i_ledg_out), 	.i_sel(i_ledg_enable), 	.o_out(w_mux5_out));
-	mux_2to1_32bit mux6 (.i_in0(w_mux5_out) , .i_in1(i_ledr_out), 	.i_sel(i_ledr_enable), 	.o_out(w_mux6_out));
-	mux_2to1_32bit mux7 (.i_in0(w_mux6_out) , .i_in1(i_mem_out), 	.i_sel(i_mem_enable), 	.o_out(o_output_data));
+	mux_2to1_32bit mux1 (.i_in0(32'b0)		 , .i_in1(i_sw_data), 	.i_sel(i_sw_enable), 	.o_out(w_mux1_out));
+	mux_2to1_32bit mux2 (.i_in0(w_mux1_out) , .i_in1(i_lcd_data), 	.i_sel(i_lcd_enable), 	.o_out(w_mux2_out));
+	mux_2to1_32bit mux3 (.i_in0(w_mux2_out) , .i_in1(i_hexh_data), 	.i_sel(i_hexh_enable), 	.o_out(w_mux3_out));
+	mux_2to1_32bit mux4 (.i_in0(w_mux3_out) , .i_in1(i_hexl_data), 	.i_sel(i_hexl_enable), 	.o_out(w_mux4_out));
+	mux_2to1_32bit mux5 (.i_in0(w_mux4_out) , .i_in1(i_ledg_data), 	.i_sel(i_ledg_enable), 	.o_out(w_mux5_out));
+	mux_2to1_32bit mux6 (.i_in0(w_mux5_out) , .i_in1(i_ledr_data), 	.i_sel(i_ledr_enable), 	.o_out(w_mux6_out));
+	mux_2to1_32bit mux7 (.i_in0(w_mux6_out) , .i_in1(i_mem_data), 	.i_sel(i_mem_enable), 	.o_out(o_output_data));
 	
 endmodule
 
