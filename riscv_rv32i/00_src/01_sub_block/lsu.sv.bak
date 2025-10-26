@@ -54,7 +54,7 @@ module lsu(
 		.i_hexh_enable(w_hexh_enable),
 		.i_hexl_enable(w_hexl_enable),
 		.i_ledg_enable(w_ledg_enable),
-		.i_ledr_enable(w_ledr_enable),
+		.i_ledr_enable(w_ledg_enable),
 		.o_lcd_out(w_lcd_out),
 		.o_hexh_out(w_hexh_out),
 		.o_hexl_out(w_hexl_out),
