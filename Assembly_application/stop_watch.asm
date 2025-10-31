@@ -3,6 +3,10 @@ jal ra, declare_variable
 
 # Loop
 loop:
+
+    li a0, 2
+    jal ra, delay_ms
+
     li a0, 0x10010000
     jal ra, read_sw
     li t0, 0x1
@@ -236,3 +240,40 @@ read_sw:
     andi a0, a0, 0x1
     mv a1, t1
     andi a1, a1, 0x2
+
+# -----------------------------------------------------
+# Function: delay_ms
+# Purpose : delay
+# Inputs  : a0 = ms
+# -----------------------------------------------------
+delay_ms:
+    li t0, 0
+    li t1, 500000
+    li t2, 0
+delay_ms_loop:
+    addi t0, t0, 1
+    blt t0, t1, delay_ms_loop
+
+    li t0, 0
+    addi t2, t2, 0
+    blt t2, a0, delay_ms_loop
+    ret
+
+# -----------------------------------------------------
+# Function: delay_us
+# Purpose : delay
+# Inputs  : a0 = us
+# -----------------------------------------------------
+delay_us:
+    li t0, 0
+    li t1, 500
+    li t2, 0
+delay_us_loop:
+    addi t0, t0, 1
+    blt t0, t1, delay_us
+
+    li t0, 0
+    addi t2, t2, 0
+    blt t2, a0, delay_us
+    ret
+    
