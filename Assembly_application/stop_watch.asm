@@ -149,9 +149,11 @@ div_end:
 #           a1 = byte_address
 # -----------------------------------------------------
 hex_led_display:
-    li t0, 0x00000000 # Base address of digit
-    add  t0, t0, a0   # Address offset
-    sb   t0, 0(a1)
+    li t0, 0x00000000   # Base address of digit table
+    slli t1, a0, 2      # Each digit stored at 4-byte aligned address
+    add t0, t0, t1      # Compute the address of the digit
+    lw t2, 0(t0)        # Load 7-segment code
+    sb t2, 0(a1)        # Write to LED
 
 # -----------------------------------------------------
 # Function: Watch
@@ -200,19 +202,21 @@ time_to_digit_convert:
     mv t0, a0
     mv t1, a1
     mv t2, a2
-    li a1, 10
 
     mv a0, t0
+    li a1, 10
     jal ra, div
     mv s0, a0
     mv s1, a1
 
     mv a0, t1
+    li a1, 10
     jal ra, div
     mv s2, a0
     mv s3, a1
 
     mv a0, t2
+    li a1, 10
     jal ra, div
     mv s4, a0
     mv s5, a1
@@ -229,7 +233,6 @@ read_sw:
     mv t0, a0
     lw t1, 0(t0)
     mv a0, t1
-    addi a0, a0, 0x1
+    andi a0, a0, 0x1
     mv a1, t1
-    addi a1, a1, 0x2
-    slli a1, a1, 1
+    andi a1, a1, 0x2
