@@ -7,26 +7,32 @@ loop:
     li a0, 2
     jal ra, delay_ms
 
+    li t0, 0x00000040 
     lw a0, 12(t0)
     li a1, 0x10002000
     jal ra, hex_led_display
 
+    li t0, 0x00000040 
     lw a0, 16(t0)
     li a1, 0x10002001
     jal ra, hex_led_display
 
+    li t0, 0x00000040 
     lw a0, 20(t0)
     li a1, 0x10002002
     jal ra, hex_led_display
 
+    li t0, 0x00000040 
     lw a0, 24(t0)
     li a1, 0x10002003
     jal ra, hex_led_display
 
+    li t0, 0x00000040 
     lw a0, 28(t0)
     li a1, 0x10003000
     jal ra, hex_led_display
 
+    li t0, 0x00000040 
     lw a0, 32(t0)
     li a1, 0x10003001
     jal ra, hex_led_display
@@ -42,6 +48,7 @@ loop:
     lw a1, 4(t0)
     lw a2, 8(t0)
     jal ra, watch_run
+    li t0, 0x00000040
     sw a0, 0(t0)
     sw a1, 4(t0)
     sw a2, 8(t0)
@@ -51,6 +58,7 @@ loop:
     lw a1, 4(t0)
     lw a2, 8(t0)
     jal ra, time_to_digit_convert
+    li t0, 0x00000040
     sw s0, 12(t0)           # Hours ten
     sw s1, 16(t0)           # Hours one
     sw s2, 20(t0)           # Minutes ten
