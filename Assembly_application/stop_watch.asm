@@ -7,6 +7,30 @@ loop:
     li a0, 2
     jal ra, delay_ms
 
+    lw a0, 12(t0)
+    li a1, 0x10002000
+    jal ra, hex_led_display
+
+    lw a0, 16(t0)
+    li a1, 0x10002001
+    jal ra, hex_led_display
+
+    lw a0, 20(t0)
+    li a1, 0x10002002
+    jal ra, hex_led_display
+
+    lw a0, 24(t0)
+    li a1, 0x10002003
+    jal ra, hex_led_display
+
+    lw a0, 28(t0)
+    li a1, 0x10003000
+    jal ra, hex_led_display
+
+    lw a0, 32(t0)
+    li a1, 0x10003001
+    jal ra, hex_led_display
+
     li a0, 0x10010000
     jal ra, read_sw
     li t0, 0x1
@@ -33,30 +57,6 @@ loop:
     sw s3, 24(t0)           # Minutes one
     sw s4, 28(t0)           # Seconds ten
     sw s5, 32(t0)           # Seconds one
-
-    lw a0, 12(t0)
-    li a1, 0x10002000
-    jal ra, hex_led_display
-
-    lw a0, 16(t0)
-    li a1, 0x10002001
-    jal ra, hex_led_display
-
-    lw a0, 20(t0)
-    li a1, 0x10002002
-    jal ra, hex_led_display
-
-    lw a0, 24(t0)
-    li a1, 0x10002003
-    jal ra, hex_led_display
-
-    lw a0, 28(t0)
-    li a1, 0x10003000
-    jal ra, hex_led_display
-
-    lw a0, 32(t0)
-    li a1, 0x10003001
-    jal ra, hex_led_display
 
     j loop
 
