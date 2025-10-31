@@ -10,9 +10,8 @@ loop:
     li a0, 0x10010000
     jal ra, read_sw
     li t0, 0x1
-    li t1, 0x2
     beq a0, t0, stop
-    beq a1, t1, reset
+    beq a1, t0, reset
 
     li t0, 0x00000040
     lw a0, 0(t0)
@@ -64,7 +63,7 @@ loop:
 stop:
     j loop
 reset:
-    jal, ra, declare_variable
+    jal ra, declare_variable
     j loop
 
 declare_variable:
@@ -158,6 +157,7 @@ hex_led_display:
     add t0, t0, t1      # Compute the address of the digit
     lw t2, 0(t0)        # Load 7-segment code
     sb t2, 0(a1)        # Write to LED
+    ret
 
 # -----------------------------------------------------
 # Function: Watch
@@ -224,7 +224,7 @@ time_to_digit_convert:
     jal ra, div
     mv s4, a0
     mv s5, a1
-
+    ret
 
 # -----------------------------------------------------
 # Function: Read SW
@@ -239,7 +239,8 @@ read_sw:
     mv a0, t1
     andi a0, a0, 0x1
     mv a1, t1
-    andi a1, a1, 0x2
+    srli a1, a1, 1
+    andi a1, a1, 0x1
 
 # -----------------------------------------------------
 # Function: delay_ms
@@ -255,7 +256,7 @@ delay_ms_loop:
     blt t0, t1, delay_ms_loop
 
     li t0, 0
-    addi t2, t2, 0
+    addi t2, t2, 1
     blt t2, a0, delay_ms_loop
     ret
 
@@ -270,10 +271,10 @@ delay_us:
     li t2, 0
 delay_us_loop:
     addi t0, t0, 1
-    blt t0, t1, delay_us
+    blt t0, t1, delay_us_loop
 
     li t0, 0
-    addi t2, t2, 0
-    blt t2, a0, delay_us
+    addi t2, t2, 1
+    blt t2, a0, delay_us_loop
     ret
     
