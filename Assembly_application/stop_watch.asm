@@ -241,6 +241,7 @@ read_sw:
     mv a1, t1
     srli a1, a1, 1
     andi a1, a1, 0x1
+    ret
 
 # -----------------------------------------------------
 # Function: delay_ms
