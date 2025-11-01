@@ -101,7 +101,7 @@ declare_variable:
     # Time initialization (00:00), stored at 0x00000040
     # -------------------------------------------------
     li t0, 0x00000040       # Base address  
-    li t1, 0x3F
+    li t1, 0
     sw t1, 0(t0)            # Minutes ten
     sw t1, 4(t0)            # Minutes one
     sw t1, 8(t0)            # Seconds ten
