@@ -4,8 +4,8 @@ jal ra, declare_variable
 # Loop
 loop:
 
-    li a0, 2
-    jal ra, delay_ms
+    #li a0, 2
+    #jal ra, delay_ms
 
     li s0, 0x00000040 
     lw a0, 0(s0)
@@ -22,6 +22,14 @@ loop:
 
     lw a0, 12(s0)
     li a1, 0x10002003
+    jal ra, hex_led_display
+
+    lw a0, 28(s0)
+    li a1, 0x10003000
+    jal ra, hex_led_display
+
+    lw a0, 32(s0)
+    li a1, 0x10003001
     jal ra, hex_led_display
 
     li a0, 0x10010000
