@@ -7,64 +7,48 @@ loop:
     li a0, 2
     jal ra, delay_ms
 
-    li t0, 0x00000040 
-    lw a0, 12(t0)
+    li s0, 0x00000040 
+    lw a0, 0(s0)
     li a1, 0x10002000
     jal ra, hex_led_display
 
-    li t0, 0x00000040 
-    lw a0, 16(t0)
+    lw a0, 4(s0)
     li a1, 0x10002001
     jal ra, hex_led_display
 
-    li t0, 0x00000040 
-    lw a0, 20(t0)
+    lw a0, 8(s0)
     li a1, 0x10002002
     jal ra, hex_led_display
 
-    li t0, 0x00000040 
-    lw a0, 24(t0)
+    lw a0, 12(s0)
     li a1, 0x10002003
     jal ra, hex_led_display
 
-    li t0, 0x00000040 
-    lw a0, 28(t0)
+    lw a0, 28(s0)
     li a1, 0x10003000
     jal ra, hex_led_display
 
-    li t0, 0x00000040 
-    lw a0, 32(t0)
+    lw a0, 32(s0)
     li a1, 0x10003001
     jal ra, hex_led_display
 
     li a0, 0x10010000
     jal ra, read_sw
-    li t0, 0x1
-    beq a0, t0, stop
-    beq a1, t0, reset
+    li s0, 0x1
+    beq a0, s0, stop
+    beq a1, s0, reset
 
-    li t0, 0x00000040
-    lw a0, 0(t0)
-    lw a1, 4(t0)
-    lw a2, 8(t0)
+    li s0, 0x00000040
+    lw a0, 0(s0)           # Minutes ten
+    lw a1, 4(s0)           # Minutes one
+    lw a2, 8(s0)           # Seconds ten
+    lw a3, 12(s0)          # Seconds one
     jal ra, watch_run
     li t0, 0x00000040
-    sw a0, 0(t0)
-    sw a1, 4(t0)
-    sw a2, 8(t0)
-
-    li t0, 0x00000040
-    lw a0, 0(t0)
-    lw a1, 4(t0)
-    lw a2, 8(t0)
-    jal ra, time_to_digit_convert
-    li t0, 0x00000040
-    sw s0, 12(t0)           # Hours ten
-    sw s1, 16(t0)           # Hours one
-    sw s2, 20(t0)           # Minutes ten
-    sw s3, 24(t0)           # Minutes one
-    sw s4, 28(t0)           # Seconds ten
-    sw s5, 32(t0)           # Seconds one
+    sw a0, 0(s0)
+    sw a1, 4(s0)
+    sw a2, 8(s0)
+    sw a3, 12(s0)
 
     j loop
 
@@ -114,45 +98,16 @@ declare_variable:
     sw t1, 60(t0)
     
     # -------------------------------------------------
-    # Time initialization (00:00:00), stored at 0x00000040
+    # Time initialization (00:00), stored at 0x00000040
     # -------------------------------------------------
-    li t0, 0x00000040       # Base address
-    li t1, 0x00              
-    sw t1, 0(t0)            # Hours
-    sw t1, 4(t0)            # Minutes
-    sw t1, 8(t0)            # Seconds
+    li t0, 0x00000040       # Base address  
     li t1, 0x3F
-    sw t1, 12(t0)           # Hours ten
-    sw t1, 16(t0)           # Hours one
-    sw t1, 20(t0)           # Minutes ten
-    sw t1, 24(t0)           # Minutes one
-    sw t1, 28(t0)           # Seconds ten
-    sw t1, 32(t0)           # Seconds one
+    sw t1, 0(t0)            # Minutes ten
+    sw t1, 4(t0)            # Minutes one
+    sw t1, 8(t0)            # Seconds ten
+    sw t1, 12(t0)           # Seconds one
 
     ret
-
-# -----------------------------------------------------
-# Function: div
-# Purpose : Unsigned integer division using subtraction
-# Inputs  : a0 = dividend
-#           a1 = divisor
-# Outputs : a0 = quotient
-#           a1 = remainder
-# -----------------------------------------------------
-div:
-    mv t0, a0
-    mv t1, a1
-    li t2, 0
-div_loop:
-    blt t0, t1, div_end
-    sub t0, t0, t1
-    addi t2, t2, 1
-    j div_loop
-div_end:
-    mv a0, t2
-    mv a1, t0
-    ret
-
 # -----------------------------------------------------
 # Function: Display 7 segment led
 # Purpose : 
@@ -170,68 +125,44 @@ hex_led_display:
 # -----------------------------------------------------
 # Function: Watch
 # Purpose : Increase 1 seconds
-# Inputs  : a0 = Hours
-#           a1 = Minutes
-#           a2 = Seconds
-# Outputs : a0 = Hours
-#           a1 = Minutes
-#           a2 = Seconds
+# Inputs  : a0 = Minutes ten
+#           a1 = Minutes one
+#           a2 = Seconds ten
+#           a3 = Seconds one
+# Outputs : a0 = Minutes ten
+#           a1 = Minutes one
+#           a2 = Seconds ten
+#           a3 = Seconds one
 # -----------------------------------------------------
 watch_run:
-    li t0, 60        # seconds & minutes upper limit
-    li t1, 24        # hours upper limit
+    li t0, 9        # one limit
+    li t1, 6        # ten limit
 
-    addi a2, a2, 1         # increment seconds
-    blt a2, t0, watch_end  # if < 60, done
+    addi a3, a3, 1
+    li   t0, 10
+    blt  a3, t0, watch_end      # if seconds one < 10, done
 
-    addi a2, x0, 0         # reset seconds
-    addi a1, a1, 1         # increment minutes
-    blt a1, t0, watch_end  # if < 60, done
+    # Reset seconds one, increment seconds ten
+    addi a3, x0, 0
+    addi a2, a2, 1
+    li   t1, 6
+    blt  a2, t1, watch_end      # if seconds ten < 6, done
 
-    addi a1, x0, 0         # reset minutes
-    addi a0, a0, 1         # increment hours
-    blt a0, t1, watch_end  # if < 24, done
+    # Reset seconds, increment minutes one
+    addi a2, x0, 0
+    addi a1, a1, 1
+    li   t2, 10
+    blt  a1, t2, watch_end      # if minutes one < 10, done
 
-    addi a0, x0, 0         # reset hours
+    # Reset minutes one, increment minutes ten
+    addi a1, x0, 0
+    addi a0, a0, 1
+    li   t3, 6
+    blt  a0, t3, watch_end      # if minutes ten < 6, done
 
+    # Reset minutes ten (rollover at 60:00)
+    addi a0, x0, 0
 watch_end:
-    ret
-
-# -----------------------------------------------------
-# Function: Time to digit convert
-# Purpose : Increase 1 seconds
-# Inputs  : a0 = Hours
-#           a1 = Minutes
-#           a2 = Seconds
-# Outputs : s0 = Hours ten
-#           s1 = Hours one
-#           s2 = Minutes ten
-#           s3 = Minutes one
-#           s4 = Seconds ten
-#           s5 = Seconds one
-# -----------------------------------------------------
-time_to_digit_convert:
-    mv t0, a0
-    mv t1, a1
-    mv t2, a2
-
-    mv a0, t0
-    li a1, 10
-    jal ra, div
-    mv s0, a0
-    mv s1, a1
-
-    mv a0, t1
-    li a1, 10
-    jal ra, div
-    mv s2, a0
-    mv s3, a1
-
-    mv a0, t2
-    li a1, 10
-    jal ra, div
-    mv s4, a0
-    mv s5, a1
     ret
 
 # -----------------------------------------------------
