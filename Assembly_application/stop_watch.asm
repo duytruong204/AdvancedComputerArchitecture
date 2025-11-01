@@ -24,14 +24,6 @@ loop:
     li a1, 0x10002003
     jal ra, hex_led_display
 
-    lw a0, 28(s0)
-    li a1, 0x10003000
-    jal ra, hex_led_display
-
-    lw a0, 32(s0)
-    li a1, 0x10003001
-    jal ra, hex_led_display
-
     li a0, 0x10010000
     jal ra, read_sw
     li s0, 0x1
