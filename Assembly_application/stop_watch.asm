@@ -9,27 +9,10 @@ loop:
 
     li s0, 0x00000040 
     lw a0, 0(s0)
-    li a1, 0x10002000
-    jal ra, hex_led_display
-
-    lw a0, 4(s0)
-    li a1, 0x10002001
-    jal ra, hex_led_display
-
-    lw a0, 8(s0)
-    li a1, 0x10002002
-    jal ra, hex_led_display
-
-    lw a0, 12(s0)
-    li a1, 0x10002003
-    jal ra, hex_led_display
-
-    lw a0, 28(s0)
-    li a1, 0x10003000
-    jal ra, hex_led_display
-
-    lw a0, 32(s0)
-    li a1, 0x10003001
+    lw a1, 4(s0)
+    lw a2, 12(s0)
+    lw a3, 16(s0)
+    nop
     jal ra, hex_led_display
 
     li a0, 0x10010000
@@ -111,16 +94,49 @@ declare_variable:
 # -----------------------------------------------------
 # Function: Display 7 segment led
 # Purpose : 
-# Inputs  : a0 = digit
-#           a1 = byte_address
+# Inputs  : a0 = digit 0
+#           a1 = digit 1
+#           a2 = digit 2
+#           a3 = digit 3
+# Output:Display
 # -----------------------------------------------------
 hex_led_display:
-    li t0, 0x00000000   # Base address of digit table
-    slli t1, a0, 2      # Each digit stored at 4-byte aligned address
-    add t0, t0, t1      # Compute the address of the digit
-    lw t2, 0(t0)        # Load 7-segment code
-    sb t2, 0(a1)        # Write to LED
+    li   t4, 0x00000000      # Base address of digit table
+    li   t5, 0               # Clear accumulator (final display value)
+
+    # --- Digit a0: minutes ten ---
+    slli t0, a0, 2           # offset = a0 * 4
+    add  t0, t0, t4          # actual address
+    lw   t1, 0(t0)           # load pattern
+    slli t1, t1, 23          # shift to [31:23]
+    or   t5, t5, t1          # add into result
+
+    # --- Digit a1: minutes one ---
+    slli t0, a1, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    slli t1, t1, 15          # shift to [22:15]
+    or   t5, t5, t1
+
+    # --- Digit a2: seconds ten ---
+    slli t0, a2, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    slli t1, t1, 7           # shift to [14:7]
+    or   t5, t5, t1
+
+    # --- Digit a3: seconds one ---
+    slli t0, a3, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    or   t5, t5, t1          # [6:0]
+
+    # --- Output to LED ---
+    li   t0, 0x10002000
+    sw   t5, 0(t0)
+
     ret
+
 
 # -----------------------------------------------------
 # Function: Watch
