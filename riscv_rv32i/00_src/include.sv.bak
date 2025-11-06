@@ -24,10 +24,8 @@
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/and_32bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/equal_32bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/equal_20bit.sv"
-// memory
+
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/02_memory/memory.sv"
-`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/02_memory/single_port_ram.sv"
-`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/02_memory/memory_ram.sv"
 // sub block
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/alu.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/brc.sv"
@@ -37,4 +35,3 @@
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/lsu.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/pc.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/regfile.sv"
-`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/lsu_load_stall.sv"

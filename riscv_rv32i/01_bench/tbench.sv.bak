@@ -4,32 +4,23 @@
 
 
 
-`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/include.sv"
+
 module tbench;
 
 // Clock and reset generator
 logic i_clk;
 logic i_reset;
-int fd,fc;
-//initial tsk_clock_gen(i_clk, `CLK_PERIOD);
-  initial begin
-//	 fd = $fopen("G:/CA/mile2/simulation_log.txt", "w");
-//	 fc = $fopen("G:/CA/mile2/cycle.txt", "w");
-    i_clk = 1'b1;
-    forever #(2) i_clk = !i_clk;
-  end
-//initial tsk_reset(i_reset, `RESET_PERIOD); // Active Low Reset
-  initial begin
-    i_reset = 1'b0;
-    #(100) i_reset = 1'b1;
-  end
-//initial tsk_timeout(`FINISH);
-  initial begin
-    #40_000 $display("\nTimeout...\n\n");
-//	 $fclose(fd);
-//	 $fclose(fc);
-            $finish;
-  end
+
+initial tsk_clock_gen(i_clk, `CLK_PERIOD);
+initial tsk_reset(i_reset, `RESET_PERIOD); // Active Low Reset
+initial tsk_timeout(`FINISH);
+
+// Wave dumping
+initial begin: proc_dump_shm
+    $shm_open("wave.shm");
+    $shm_probe(dut, "AS");
+end
+
 
 
 logic [31:0]  i_io_sw  ;

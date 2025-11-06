@@ -156,7 +156,7 @@ module internal_memory (
 	output wire [31:0] 	o_mem_data
 );
 	//RV32I provides a 32-bit address space that is byte-addressed.
-	memory #(.N(2048)) internal_memory (
+	memory_ram #(.DEPTH(2048)) internal_memory (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_memory_addr),
@@ -194,7 +194,7 @@ module ouput_peripheral_memory(
 
 	//RV32I provides a 32-bit address space that is byte-addressed.
 	// Other peripheral device with write by i_wdata
-	memory #(.N(4096)) lcd_control_register (
+	memory_ram #(.DEPTH(4096)) lcd_control_register (
 		.i_clk(i_clk), 
 		.i_reset(i_reset), 
 		.i_addr(i_peripheral_addr), 
@@ -210,7 +210,7 @@ module ouput_peripheral_memory(
 		.o_q(o_lcd_out)
 	);
 
-	memory #(.N(4096)) seven_segment_leds_7to4 (
+	memory_ram #(.DEPTH(4096)) seven_segment_leds_7to4 (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
@@ -226,7 +226,7 @@ module ouput_peripheral_memory(
 		.o_q(o_hexh_out)
 	);
 
-	memory #(.N(4096)) seven_segment_leds_3to0 (
+	memory_ram #(.DEPTH(4096)) seven_segment_leds_3to0 (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
@@ -242,7 +242,7 @@ module ouput_peripheral_memory(
 		.o_q(o_hexl_out)
 	);
 
-	memory #(.N(4096)) green_leds (
+	memory_ram #(.DEPTH(4096)) green_leds (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
@@ -259,7 +259,7 @@ module ouput_peripheral_memory(
 		.o_q(o_ledg_out)
 	);
 
-	memory #(.N(4096)) red_leds (
+	memory_ram #(.DEPTH(4096)) red_leds (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
@@ -290,7 +290,7 @@ module input_peripheral_memory(
 );
 	//RV32I provides a 32-bit address space that is byte-addressed.
 	// Switch will write by SW device (i_io_sw)
-	memory #(.N(4096)) Switches (
+	memory #(.DEPTH(4096)) Switches (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),

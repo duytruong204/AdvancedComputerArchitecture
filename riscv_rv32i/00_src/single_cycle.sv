@@ -40,9 +40,13 @@ module single_cycle(
 	wire [2:0]	w_type_access;
 	wire		w_mem_rw;
 	wire [1:0]	w_wb_sel;
-	
+
+	// Stalling for LSU
+	wire w_lsu_load_stall;
+
 	pc pc(
 		.i_clk(i_clk),
+		.i_inst(w_inst),
 		.i_reset(i_reset), 
 		.i_pc(w_pc_new),
 		.o_pc(w_pc)
