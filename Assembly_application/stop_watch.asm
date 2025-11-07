@@ -12,7 +12,6 @@ loop:
     lw a1, 4(s0)
     lw a2, 8(s0)
     lw a3, 12(s0)
-    nop
     jal ra, hex_led_display
 
     li a0, 0x10010000
