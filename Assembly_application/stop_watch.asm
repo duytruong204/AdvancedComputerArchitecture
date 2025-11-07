@@ -10,8 +10,8 @@ loop:
     li s0, 0x00000040 
     lw a0, 0(s0)
     lw a1, 4(s0)
-    lw a2, 12(s0)
-    lw a3, 16(s0)
+    lw a2, 8(s0)
+    lw a3, 12(s0)
     nop
     jal ra, hex_led_display
 
