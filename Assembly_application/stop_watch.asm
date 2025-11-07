@@ -107,28 +107,28 @@ hex_led_display:
     slli t0, a0, 2           # offset = a0 * 4
     add  t0, t0, t4          # actual address
     lw   t1, 0(t0)           # load pattern
-    slli t1, t1, 23          # shift to [31:23]
+    slli t1, t1, 24          # shift to [31:24]
     or   t5, t5, t1          # add into result
 
     # --- Digit a1: minutes one ---
     slli t0, a1, 2
     add  t0, t0, t4
     lw   t1, 0(t0)
-    slli t1, t1, 15          # shift to [22:15]
+    slli t1, t1, 16          # shift to [23:16]
     or   t5, t5, t1
 
     # --- Digit a2: seconds ten ---
     slli t0, a2, 2
     add  t0, t0, t4
     lw   t1, 0(t0)
-    slli t1, t1, 7           # shift to [14:7]
+    slli t1, t1, 8           # shift to [15:8]
     or   t5, t5, t1
 
     # --- Digit a3: seconds one ---
     slli t0, a3, 2
     add  t0, t0, t4
     lw   t1, 0(t0)
-    or   t5, t5, t1          # [6:0]
+    or   t5, t5, t1          # [7:0]
 
     # --- Output to LED ---
     li   t0, 0x10002000
