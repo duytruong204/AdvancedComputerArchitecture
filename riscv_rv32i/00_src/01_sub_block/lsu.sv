@@ -194,84 +194,87 @@ module ouput_peripheral_memory(
 
 	//RV32I provides a 32-bit address space that is byte-addressed.
 	// Other peripheral device with write by i_wdata
+	wire w_lcd_write_enable = i_lcd_enable & i_lsu_wren;
 	memory_ram #(.DEPTH(4096)) lcd_control_register (
 		.i_clk(i_clk), 
 		.i_reset(i_reset), 
 		.i_addr(i_peripheral_addr), 
 		.i_bmask(i_bmask),
-		.i_wren(i_lcd_enable & i_lsu_wren),
+		.i_wren(w_lcd_write_enable),
 		.i_wdata(i_write_data),
 		.o_rdata(o_lcd_data)
 	);
 	d_latch_32bit lcd_control_latch (
 		.i_reset(i_reset),
-		.i_en(i_lcd_enable & i_lsu_wren),
+		.i_en(w_lcd_write_enable),
 		.i_d(o_lcd_data),
 		.o_q(o_lcd_out)
 	);
 
+	wire w_hexh_write_enable = i_hexh_enable & i_lsu_wren;
 	memory_ram #(.DEPTH(4096)) seven_segment_leds_7to4 (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
 		.i_bmask(i_bmask),
-		.i_wren(i_hexh_enable & i_lsu_wren),
+		.i_wren(w_hexh_write_enable),
 		.i_wdata(i_write_data),
-		.o_rdata(w_hexh_data)
+		.o_rdata(o_hexh_data)
 	);
 	d_latch_32bit seven_segment_leds_7to4_latch (
 		.i_reset(i_reset),
-		.i_en(i_hexh_enable & i_lsu_wren),
+		.i_en(w_hexh_write_enable),
 		.i_d(o_hexh_data),
 		.o_q(o_hexh_out)
 	);
 
+	wire w_hexl_write_enable = i_hexl_enable & i_lsu_wren;
 	memory_ram #(.DEPTH(4096)) seven_segment_leds_3to0 (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
 		.i_bmask(i_bmask),
-		.i_wren(i_hexl_enable & i_lsu_wren),
+		.i_wren(w_hexl_write_enable),
 		.i_wdata(i_write_data),
 		.o_rdata(o_hexl_data)
 	);
 	d_latch_32bit seven_segment_leds_3to0_latch (
 		.i_reset(i_reset),
-		.i_en(i_hexl_enable & i_lsu_wren),
+		.i_en(w_hexl_write_enable),
 		.i_d(o_hexl_data),
 		.o_q(o_hexl_out)
 	);
 
+	wire w_ledg_write_enable = i_ledg_enable & i_lsu_wren;
 	memory_ram #(.DEPTH(4096)) green_leds (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
 		.i_bmask(i_bmask),
-		.i_wren(i_ledg_enable & i_lsu_wren),
+		.i_wren(w_ledg_write_enable),
 		.i_wdata(i_write_data),
 		.o_rdata(o_ledg_data)
 	);
-
 	d_latch_32bit green_leds_latch (
 		.i_reset(i_reset),
-		.i_en(i_ledg_enable & i_lsu_wren),
+		.i_en(w_ledg_write_enable),
 		.i_d(o_ledg_data),
 		.o_q(o_ledg_out)
 	);
 
+	wire w_ledr_write_enable = i_ledr_enable & i_lsu_wren;
 	memory_ram #(.DEPTH(4096)) red_leds (
 		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_addr(i_peripheral_addr),
 		.i_bmask(i_bmask),
-		.i_wren(i_ledr_enable & i_lsu_wren),
+		.i_wren(w_ledr_write_enable),
 		.i_wdata(i_write_data),
 		.o_rdata(o_ledr_data)
 	);
-
 	d_latch_32bit red_leds_latch (
 		.i_reset(i_reset),
-		.i_en(i_ledr_enable & i_lsu_wren),
+		.i_en(w_ledr_write_enable),
 		.i_d(o_ledr_data),
 		.o_q(o_ledr_out)
 	);

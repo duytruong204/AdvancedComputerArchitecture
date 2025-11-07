@@ -1,5 +1,5 @@
 // Quartus II Verilog Template
-// Single port RAM with single read/write address 
+// Single port RAM with single synchronous read/write address 
 
 module single_port_ram 
 #(parameter DATA_WIDTH=8, parameter DEPTH=512)

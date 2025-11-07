@@ -1,5 +1,5 @@
 // Byte-addressable memory module (32-bit word interface)
-// Supports byte-enable write (via i_bmask), synchronous write, asynchronous read
+// Supports byte-enable write (via i_bmask), synchronous write, synchronous read
 module memory_ram #(
 	parameter DEPTH = 4096 // Number of memory bytes
 )(
@@ -9,25 +9,51 @@ module memory_ram #(
 	input  wire [3:0]               i_bmask,      // Byte mask (1 = enable write)
 	input  wire [31:0]              i_wdata,      // Write data
 	input  wire                     i_wren,       // Write enable
-	output wire [31:0]              o_rdata       // Read data (combinational)
+	output wire [31:0]              o_rdata       // Read data (synchronous)
 );
 	
 	localparam ADDR_WIDTH = $clog2(DEPTH);
-	//wire w_is_addr_byte_0 = ~i_addr[1] & ~i_addr[0]; //00
-	//wire w_is_addr_byte_1 = ~i_addr[1] &  i_addr[0]; //01
-	//wire w_is_addr_byte_2 =  i_addr[1] & ~i_addr[0]; //10
-	//wire w_is_addr_byte_3 =  i_addr[1] &  i_addr[0]; //11
 	
 	wire [31:0] w_wdata_shifted;
 	wire [3:0] w_bmask_shifted;
 	wire [7:0] w_byte_rdata_0, w_byte_rdata_1, w_byte_rdata_2, w_byte_rdata_3;
 
-	wire [ADDR_WIDTH-3:0] base_word_addr = i_addr[ADDR_WIDTH-1:2];
+	wire [ADDR_WIDTH-3:0] w_base_word_addr = i_addr[ADDR_WIDTH-1:2];
+	wire [ADDR_WIDTH-3:0] w_base_word_addr_plus1;
 
-	wire [ADDR_WIDTH-3:0] w_byte_addr_0 = base_word_addr + (i_addr[1:0] > 2'd0);
-	wire [ADDR_WIDTH-3:0] w_byte_addr_1 = base_word_addr + (i_addr[1:0] > 2'd1);
-	wire [ADDR_WIDTH-3:0] w_byte_addr_2 = base_word_addr + (i_addr[1:0] > 2'd2);
-	wire [ADDR_WIDTH-3:0] w_byte_addr_3 = base_word_addr;
+	full_adder_nbit #(.N(ADDR_WIDTH-2)) addr_adder (
+		.i_a(w_base_word_addr),
+		.i_b({{(ADDR_WIDTH-3){1'b0}}, 1'b1}),
+		.i_carry(1'b0),
+		.o_sum(w_base_word_addr_plus1),
+		.o_carry()
+	);
+
+	wire [ADDR_WIDTH-3:0] w_byte_addr_0;
+	mux_2to1_nbit #(.N(ADDR_WIDTH-2)) addr_mux_byte_addr_0 (
+		.i_in0(w_base_word_addr),
+		.i_in1(w_base_word_addr_plus1),
+		.i_sel(i_addr[1] | i_addr[0]),
+		.o_out(w_byte_addr_0)
+	);
+
+	wire [ADDR_WIDTH-3:0] w_byte_addr_1;
+	mux_2to1_nbit #(.N(ADDR_WIDTH-2)) addr_mux_byte_addr_1 (
+		.i_in0(w_base_word_addr),
+		.i_in1(w_base_word_addr_plus1),
+		.i_sel(i_addr[1]),
+		.o_out(w_byte_addr_1)
+	);
+
+	wire [ADDR_WIDTH-3:0] w_byte_addr_2;
+	mux_2to1_nbit #(.N(ADDR_WIDTH-2)) addr_mux_byte_addr_2 (
+		.i_in0(w_base_word_addr),
+		.i_in1(w_base_word_addr_plus1),
+		.i_sel(i_addr[1] & i_addr[0]),
+		.o_out(w_byte_addr_2)
+	);
+
+	wire [ADDR_WIDTH-3:0] w_byte_addr_3 = w_base_word_addr;
 	
 	mux_4to1_32bit mux_data_in (
 		.i_in0(i_wdata),

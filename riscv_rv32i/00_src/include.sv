@@ -4,6 +4,7 @@
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/00_mux/mux_2to1_3bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/00_mux/mux_2to1_4bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/00_mux/mux_2to1_32bit.sv"
+`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/00_mux/mux_2to1_nbit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/00_mux/mux_4to1_1bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/00_mux/mux_4to1_4bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/00_mux/mux_4to1_32bit.sv"
@@ -14,6 +15,7 @@
 // operation
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/full_adder_1bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/full_adder_32bit.sv"
+`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/full_adder_nbit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/sll_32bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/slt_32bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/sltu_32bit.sv"
@@ -37,4 +39,3 @@
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/lsu.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/pc.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/regfile.sv"
-`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/01_sub_block/lsu_load_stall.sv"
