@@ -4,7 +4,7 @@ jal ra, declare_variable
 # Loop
 loop:
 
-    li a0, 1000
+    li a0, 100
     jal ra, delay_ms
 
     li s0, 0x00000040 
@@ -205,7 +205,7 @@ read_sw:
 # -----------------------------------------------------
 delay_ms:
     li t0, 0
-    li t1, 500000
+    li t1, 25000
     li t2, 0
 delay_ms_loop:
     addi t0, t0, 1
@@ -223,7 +223,7 @@ delay_ms_loop:
 # -----------------------------------------------------
 delay_us:
     li t0, 0
-    li t1, 500
+    li t1, 25
     li t2, 0
 delay_us_loop:
     addi t0, t0, 1
