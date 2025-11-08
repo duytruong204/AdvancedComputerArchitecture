@@ -4,8 +4,8 @@ jal ra, declare_variable
 # Loop
 loop:
 
-    #li a0, 2
-    #jal ra, delay_ms
+    li a0, 1000
+    jal ra, delay_ms
 
     li s0, 0x00000040 
     lw a0, 0(s0)
@@ -46,38 +46,39 @@ declare_variable:
     # Each entry = 1 byte, aligned to 4 bytes for sw
     # -------------------------------------------------
     li t0, 0x00000000       # Base address
-    li t1, 0x3F             # 0
+    li t1, 0x40             # 0
     sw t1, 0(t0)
-    li t1, 0x06             # 1
+    li t1, 0x79             # 1
     sw t1, 4(t0)
-    li t1, 0x5B             # 2
+    li t1, 0x24             # 2
     sw t1, 8(t0)
-    li t1, 0x4F             # 3
+    li t1, 0x30             # 3
     sw t1, 12(t0)
-    li t1, 0x66             # 4
+    li t1, 0x19             # 4
     sw t1, 16(t0)
-    li t1, 0x6D              # 5
+    li t1, 0x12             # 5
     sw t1, 20(t0)
-    li t1, 0x7D              # 6
+    li t1, 0x02             # 6
     sw t1, 24(t0)
-    li t1, 0x07              # 7
+    li t1, 0x78             # 7
     sw t1, 28(t0)
-    li t1, 0x7F              # 8
+    li t1, 0x00             # 8
     sw t1, 32(t0)
-    li t1, 0x6F              # 9
+    li t1, 0x10             # 9
     sw t1, 36(t0)
-    li t1, 0x77              # A
+    li t1, 0x08             # A
     sw t1, 40(t0)
-    li t1, 0x7C              # B
+    li t1, 0x03             # B
     sw t1, 44(t0)
-    li t1, 0x39              # C
+    li t1, 0x46             # C
     sw t1, 48(t0)
-    li t1, 0x5E              # D
+    li t1, 0x21             # D
     sw t1, 52(t0)
-    li t1, 0x79              # E
+    li t1, 0x06             # E
     sw t1, 56(t0)
-    li t1, 0x71              # F
+    li t1, 0x0E             # F
     sw t1, 60(t0)
+
     
     # -------------------------------------------------
     # Time initialization (00:00), stored at 0x00000040
