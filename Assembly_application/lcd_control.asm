@@ -49,10 +49,10 @@ lcd_data:
 # -----------------------------------------------------
 lcd_cmd:
     li t0, 0x1000_4000   # Addr of LCD
-    mv t1, a0            # Preserve original command in t1
+    mv s0, a0            # Preserve original command in t1
 
     # --- Step 1: Send with EN = 1 ---
-    mv a0, t1            # a0 = data (command)
+    mv a0, s0            # a0 = data (command)
     li a1, 0             # R/W = 0 (write)
     li a2, 0             # RS  = 0 (command mode)
     li a3, 1             # EN  = 1 (enable high)
@@ -64,7 +64,7 @@ lcd_cmd:
     jal ra, delay_ms
 
     # --- Step 2: Send with EN = 0 ---
-    mv a0, t1            # restore command
+    mv a0, s0            # restore command
     li a1, 0             # R/W = 0
     li a2, 0             # RS  = 0
     li a3, 0             # EN  = 0 (disable)
