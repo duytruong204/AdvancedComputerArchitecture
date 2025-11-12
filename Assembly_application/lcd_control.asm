@@ -1,3 +1,14 @@
+# Main
+jal ra, lcd_init
+li a0, "A"
+jal ra, lcd_char
+li a0, 0xC0
+jal ra, lcd_cmd
+li a0, "B"
+jal ra, lcd_char
+loop:
+    j loop
+
 
 # -----------------------------------------------------
 # Function: lcd_init
@@ -5,14 +16,28 @@
 # Inputs  : 
 # -----------------------------------------------------
 lcd_init:
-
+    li a0, 20             # delay 20ms
+    jal ra, delay_ms
+    li a0, 0x38
+    jal ra, lcd_cmd
+    li a0, 0x0C
+    jal ra, lcd_cmd
+    li a0, 0x06
+    jal ra, lcd_cmd
+    li a0, 0x01
+    jal ra, lcd_cmd
+    li a0, 0x80
+    jal ra, lcd_cmd
+    ret
 # -----------------------------------------------------
-# Function: lcd_data
+# Function: lcd_char
 # Purpose : Send data to LCD (for characters)
 # Inputs  : a0 = data (8-bit)
 # -----------------------------------------------------
-lcd_data:
+lcd_char:
     li t0, 0x1000_4000   # Addr of LCD
+    addi sp, sp, -8
+    sw s0, 0(sp)
     mv s0, a0            # Preserve original data
 
     # --- Step 1: Send with EN = 1 ---
@@ -39,7 +64,10 @@ lcd_data:
     li a0, 5             # delay 5ms
     jal ra, delay_ms
 
+    lw s0, 0(sp)         # restore s0 first
+    addi sp, sp, 8       # then release stack space
     ret
+
 
 
 # -----------------------------------------------------
@@ -49,6 +77,8 @@ lcd_data:
 # -----------------------------------------------------
 lcd_cmd:
     li t0, 0x1000_4000   # Addr of LCD
+    addi sp, sp, -8
+    sw s0, 0(sp)
     mv s0, a0            # Preserve original command in t1
 
     # --- Step 1: Send with EN = 1 ---
@@ -74,7 +104,8 @@ lcd_cmd:
 
     li a0, 5             # delay 5ms
     jal ra, delay_ms
-
+    lw s0, 0(sp)         # restore s0 first
+    addi sp, sp, 8       # then release stack space
     ret
 
 
