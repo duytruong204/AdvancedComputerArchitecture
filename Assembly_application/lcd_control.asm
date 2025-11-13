@@ -36,12 +36,10 @@ lcd_init:
 # -----------------------------------------------------
 lcd_char:
     li t0, 0x1000_4000   # Addr of LCD
-    addi sp, sp, -8
-    sw s0, 0(sp)
-    mv s0, a0            # Preserve original data
+    mv t1, a0            # Preserve original data
 
     # --- Step 1: Send with EN = 1 ---
-    mv a0, s0            # a0 = data
+    mv a0, s1            # a0 = data
     li a1, 0             # R/W = 0 (write)
     li a2, 1             # RS  = 1 (data mode)
     li a3, 1             # EN  = 1 (enable high)
@@ -53,7 +51,7 @@ lcd_char:
     jal ra, delay_ms
 
     # --- Step 2: Send with EN = 0 ---
-    mv a0, s0            # restore data
+    mv a0, s1            # restore data
     li a1, 0             # R/W = 0
     li a2, 1             # RS  = 1 (data mode)
     li a3, 0             # EN  = 0 (disable)
@@ -64,8 +62,6 @@ lcd_char:
     li a0, 5             # delay 5ms
     jal ra, delay_ms
 
-    lw s0, 0(sp)         # restore s0 first
-    addi sp, sp, 8       # then release stack space
     ret
 
 
@@ -77,9 +73,7 @@ lcd_char:
 # -----------------------------------------------------
 lcd_cmd:
     li t0, 0x1000_4000   # Addr of LCD
-    addi sp, sp, -8
-    sw s0, 0(sp)
-    mv s0, a0            # Preserve original command in t1
+    mv t1, a0            # Preserve original command in t1
 
     # --- Step 1: Send with EN = 1 ---
     mv a0, s0            # a0 = data (command)
@@ -104,8 +98,6 @@ lcd_cmd:
 
     li a0, 5             # delay 5ms
     jal ra, delay_ms
-    lw s0, 0(sp)         # restore s0 first
-    addi sp, sp, 8       # then release stack space
     ret
 
 
