@@ -153,6 +153,12 @@ make_lcd_word:
 # Inputs  : a0 = ms
 # -----------------------------------------------------
 delay_ms:
+    li sp, 0x000007F0 # max 0x000007FF
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw ra, 16(sp)
+
     li t0, 0
     li t1, 25000
     li t2, 0
@@ -163,6 +169,16 @@ delay_ms_loop:
     li t0, 0
     addi t2, t2, 1
     blt t2, a0, delay_ms_loop
+
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 0(sp)
+
+    li sp, 0x000007F0 # max 0x000007FF
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw ra, 16(sp)
     ret
 # -----------------------------------------------------
 # Function: delay_us(a0)
@@ -170,6 +186,12 @@ delay_ms_loop:
 # Inputs  : a0 = us
 # -----------------------------------------------------
 delay_us:
+    li sp, 0x000007F0 # max 0x000007FF
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw ra, 16(sp)
+
     li t0, 0
     li t1, 25
     li t2, 0
@@ -180,4 +202,10 @@ delay_us_loop:
     li t0, 0
     addi t2, t2, 1
     blt t2, a0, delay_us_loop
+
+    li sp, 0x000007F0 # max 0x000007FF
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw ra, 16(sp)
     ret
