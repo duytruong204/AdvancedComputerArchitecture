@@ -16,7 +16,11 @@ loop:
 # Purpose :  LCD Initialize function
 # Inputs  : 
 # -----------------------------------------------------
-lcd_init:
+lcd_init:    
+    li sp, 0x00000700 # max 0x000007FF
+    sw a0, 0(sp)
+    sw ra, 4(sp)
+
     li a0, 20             # delay 20ms
     jal ra, delay_ms
     li a0, 0x38
@@ -29,6 +33,10 @@ lcd_init:
     jal ra, lcd_cmd
     li a0, 0x80
     jal ra, lcd_cmd
+
+    li sp, 0x00000700 # max 0x000007FF
+    lw a0, 0(sp)
+    lw ra, 4(sp)
     ret
 # -----------------------------------------------------
 # Function: lcd_char
@@ -36,6 +44,16 @@ lcd_init:
 # Inputs  : a0 = data (8-bit)
 # -----------------------------------------------------
 lcd_char:
+    li sp, 0x00000700 # max 0x000007FF
+    sw t3, 0(sp)
+    sw t4, 4(sp)
+    sw a0, 8(sp)
+    sw a1, 12(sp)
+    sw a2, 16(sp)
+    sw a3, 20(sp)
+    sw a4, 24(sp)
+    sw ra, 28(sp)
+
     li t4, 0x10004000   # Addr of LCD
     mv t3, a0            # Preserve original data
 
@@ -63,6 +81,15 @@ lcd_char:
     li a0, 5             # delay 5ms
     jal ra, delay_ms
 
+    li sp, 0x00000700 # max 0x000007FF
+    lw t3, 0(sp)
+    lw t4, 4(sp)
+    lw a0, 8(sp)
+    lw a1, 12(sp)
+    lw a2, 16(sp)
+    lw a3, 20(sp)
+    lw a4, 24(sp)
+    lw ra, 28(sp)
     ret
 
 
@@ -93,6 +120,16 @@ lcd_char:
 # 17	C0	        Force cursor to the beginning ( 2nd line)
 
 lcd_cmd:
+    li sp, 0x00000700 # max 0x000007FF
+    sw t3, 0(sp)
+    sw t4, 4(sp)
+    sw a0, 8(sp)
+    sw a1, 12(sp)
+    sw a2, 16(sp)
+    sw a3, 20(sp)
+    sw a4, 24(sp)
+    sw ra, 28(sp)
+
     li t4, 0x10004000   # Addr of LCD
     mv t3, a0            # Preserve original command in t3
 
@@ -119,6 +156,16 @@ lcd_cmd:
 
     li a0, 5             # delay 5ms
     jal ra, delay_ms
+
+    li sp, 0x00000700 # max 0x000007FF
+    lw t3, 0(sp)
+    lw t4, 4(sp)
+    lw a0, 8(sp)
+    lw a1, 12(sp)
+    lw a2, 16(sp)
+    lw a3, 20(sp)
+    lw a4, 24(sp)
+    lw ra, 28(sp)
     ret
 
 
@@ -135,6 +182,14 @@ lcd_cmd:
 #   a0 = packed 32-bit LCD word
 # =====================================================
 make_lcd_word:
+    li sp, 0x00000700 # max 0x000007FF
+    sw t0, 0(sp)
+    sw a1, 4(sp)
+    sw a2, 8(sp)
+    sw a3, 12(sp)
+    sw a4, 16(sp)
+    sw ra, 20(sp)
+
     mv   t0, a0          # start with data in t0
     slli a1, a1, 8       # shift R/W
     slli a2, a2, 9       # shift RS
@@ -145,6 +200,14 @@ make_lcd_word:
     or   t0, t0, a3
     or   t0, t0, a4
     mv   a0, t0
+
+    li sp, 0x00000700 # max 0x000007FF
+    lw t0, 0(sp)
+    lw a1, 4(sp)
+    lw a2, 8(sp)
+    lw a3, 12(sp)
+    lw a4, 16(sp)
+    lw ra, 20(sp)
     ret
 
 # -----------------------------------------------------
@@ -153,11 +216,11 @@ make_lcd_word:
 # Inputs  : a0 = ms
 # -----------------------------------------------------
 delay_ms:
-    li sp, 0x000007F0 # max 0x000007FF
+    li sp, 0x00000700 # max 0x000007FF
     sw t0, 0(sp)
     sw t1, 4(sp)
     sw t2, 8(sp)
-    sw ra, 16(sp)
+    sw ra, 12(sp)
 
     li t0, 0
     li t1, 25000
@@ -174,11 +237,11 @@ delay_ms_loop:
     lw t1, 4(sp)
     lw t2, 0(sp)
 
-    li sp, 0x000007F0 # max 0x000007FF
+    li sp, 0x00000700 # max 0x000007FF
     lw t0, 0(sp)
     lw t1, 4(sp)
     lw t2, 8(sp)
-    lw ra, 16(sp)
+    lw ra, 12(sp)
     ret
 # -----------------------------------------------------
 # Function: delay_us(a0)
@@ -186,11 +249,11 @@ delay_ms_loop:
 # Inputs  : a0 = us
 # -----------------------------------------------------
 delay_us:
-    li sp, 0x000007F0 # max 0x000007FF
+    li sp, 0x00000700 # max 0x000007FF
     sw t0, 0(sp)
     sw t1, 4(sp)
     sw t2, 8(sp)
-    sw ra, 16(sp)
+    sw ra, 12(sp)
 
     li t0, 0
     li t1, 25
@@ -203,9 +266,9 @@ delay_us_loop:
     addi t2, t2, 1
     blt t2, a0, delay_us_loop
 
-    li sp, 0x000007F0 # max 0x000007FF
+    li sp, 0x00000700 # max 0x000007FF
     lw t0, 0(sp)
     lw t1, 4(sp)
     lw t2, 8(sp)
-    lw ra, 16(sp)
+    lw ra, 12(sp)
     ret
