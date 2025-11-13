@@ -36,7 +36,7 @@ lcd_init:
 # Inputs  : a0 = data (8-bit)
 # -----------------------------------------------------
 lcd_char:
-    li t0, 0x10004000   # Addr of LCD
+    li t4, 0x10004000   # Addr of LCD
     mv t3, a0            # Preserve original data
 
     # --- Step 1: Send with EN = 1 ---
@@ -46,7 +46,7 @@ lcd_char:
     li a3, 1             # EN  = 1 (enable high)
     li a4, 1             # ON  = 1 (LCD on)
     jal ra, make_lcd_word
-    sw a0, 0(t0)         # write to LCD
+    sw a0, 0(t4)         # write to LCD
 
     li a0, 1             # delay 1ms
     jal ra, delay_ms
@@ -58,7 +58,7 @@ lcd_char:
     li a3, 0             # EN  = 0 (disable)
     li a4, 1             # ON  = 1
     jal ra, make_lcd_word
-    sw a0, 0(t0)         # write to LCD again
+    sw a0, 0(t4)         # write to LCD again
 
     li a0, 5             # delay 5ms
     jal ra, delay_ms
@@ -93,7 +93,7 @@ lcd_char:
 # 17	C0	        Force cursor to the beginning ( 2nd line)
 
 lcd_cmd:
-    li t0, 0x10004000   # Addr of LCD
+    li t4, 0x10004000   # Addr of LCD
     mv t3, a0            # Preserve original command in t3
 
     # --- Step 1: Send with EN = 1 ---
@@ -103,7 +103,7 @@ lcd_cmd:
     li a3, 1             # EN  = 1 (enable high)
     li a4, 1             # ON  = 1 (LCD on)
     jal ra, make_lcd_word
-    sw a0, 0(t0)         # write to LCD
+    sw a0, 0(t4)         # write to LCD
 
     li a0, 1             # delay 1ms
     jal ra, delay_ms
@@ -115,7 +115,7 @@ lcd_cmd:
     li a3, 0             # EN  = 0 (disable)
     li a4, 1             # ON  = 1
     jal ra, make_lcd_word
-    sw a0, 0(t0)         # write to LCD again
+    sw a0, 0(t4)         # write to LCD again
 
     li a0, 5             # delay 5ms
     jal ra, delay_ms
