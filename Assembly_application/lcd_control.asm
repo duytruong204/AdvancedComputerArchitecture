@@ -1,30 +1,11 @@
-# List command
-# Sr.No.	Hex Code	Command to LCD instruction Register
-# 1	    01	Clear display screen
-# 2	    02	Return home
-# 3	    04	Decrement cursor (shift cursor to left)
-# 4	    06	Increment cursor (shift cursor to right)
-# 5	    05	Shift display right
-# 6	    07	Shift display left
-# 7 	08	Display off, cursor off
-# 8	    0A	Display off, cursor on
-# 9	    0C	Display on, cursor off
-# 10	0E	Display on, cursor blinking
-# 11	0F	Display on, cursor blinking
-# 12	10	Shift cursor position to left
-# 13	14	Shift the cursor position to the right
-# 14	18	Shift the entire display to the left
-# 15	1C	Shift the entire display to the right
-# 16	80	Force cursor to the beginning ( 1st line)
-# 17	C0	Force cursor to the beginning ( 2nd line)
 
 # Main
 jal ra, lcd_init
-li a0, 41 # "A"
+li a0, 'A'
 jal ra, lcd_char
 li a0, 0xC0
 jal ra, lcd_cmd
-li a0, 42 # "B"
+li a0, 'B'
 jal ra, lcd_char
 loop:
     j loop
@@ -56,10 +37,10 @@ lcd_init:
 # -----------------------------------------------------
 lcd_char:
     li t0, 0x10004000   # Addr of LCD
-    mv t1, a0            # Preserve original data
+    mv t3, a0            # Preserve original data
 
     # --- Step 1: Send with EN = 1 ---
-    mv a0, s1            # a0 = data
+    mv a0, t3            # a0 = data
     li a1, 0             # R/W = 0 (write)
     li a2, 1             # RS  = 1 (data mode)
     li a3, 1             # EN  = 1 (enable high)
@@ -71,7 +52,7 @@ lcd_char:
     jal ra, delay_ms
 
     # --- Step 2: Send with EN = 0 ---
-    mv a0, s1            # restore data
+    mv a0, t3            # restore data
     li a1, 0             # R/W = 0
     li a2, 1             # RS  = 1 (data mode)
     li a3, 0             # EN  = 0 (disable)
@@ -91,12 +72,32 @@ lcd_char:
 # Purpose : Send command to LCD
 # Inputs  : a0 = command (8-bit)
 # -----------------------------------------------------
+# List command
+# Sr |  Hex-Code |  Command to LCD instruction Register
+# 1	    01	        Clear display screen
+# 2	    02	        Return home
+# 3	    04	        Decrement cursor (shift cursor to left)
+# 4	    06	        Increment cursor (shift cursor to right)
+# 5	    05	        Shift display right
+# 6	    07	        Shift display left
+# 7 	08	        Display off, cursor off
+# 8	    0A	        Display off, cursor on
+# 9	    0C	        Display on, cursor off
+# 10	0E	        Display on, cursor blinking
+# 11	0F	        Display on, cursor blinking
+# 12	10	        Shift cursor position to left
+# 13	14	        Shift the cursor position to the right
+# 14	18	        Shift the entire display to the left
+# 15	1C	        Shift the entire display to the right
+# 16	80	        Force cursor to the beginning ( 1st line)
+# 17	C0	        Force cursor to the beginning ( 2nd line)
+
 lcd_cmd:
     li t0, 0x10004000   # Addr of LCD
-    mv t1, a0            # Preserve original command in t1
+    mv t3, a0            # Preserve original command in t3
 
     # --- Step 1: Send with EN = 1 ---
-    mv a0, s0            # a0 = data (command)
+    mv a0, t3            # a0 = data (command)
     li a1, 0             # R/W = 0 (write)
     li a2, 0             # RS  = 0 (command mode)
     li a3, 1             # EN  = 1 (enable high)
@@ -108,7 +109,7 @@ lcd_cmd:
     jal ra, delay_ms
 
     # --- Step 2: Send with EN = 0 ---
-    mv a0, s0            # restore command
+    mv a0, t3            # restore command
     li a1, 0             # R/W = 0
     li a2, 0             # RS  = 0
     li a3, 0             # EN  = 0 (disable)
