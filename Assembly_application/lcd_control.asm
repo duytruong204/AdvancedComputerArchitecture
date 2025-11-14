@@ -73,7 +73,7 @@ lcd_char:
     # a0 = data (command)       [7:0]
     lui t0, 0x80000          # bit 31 = 1
     ori t0, t0, 0x0600       # 110 0000 0000
-    ori t0, t0, a0           # insert data bits 7:0
+    or  t0, t0, a0           # insert data bits 7:0
     li  t1, 0x10004000       # Addr of LCD
     sw  t0, 0(t1)            # write to LCD
 
@@ -90,7 +90,7 @@ lcd_char:
 
     lui t0, 0x80000          # bit 31 = 1
     ori t0, t0, 0x0200       # 010 0000 0000
-    ori t0, t0, a0           # insert data bits 7:0
+    or  t0, t0, a0           # insert data bits 7:0
     li  t1, 0x10004000       # Addr of LCD
     sw  t0, 0(t1)            # write to LCD
 
@@ -157,7 +157,7 @@ lcd_cmd:
 
     lui t0, 0x80000          # bit 31 = 1
     ori t0, t0, 0x0400       # 100 0000 0000
-    ori t0, t0, a0           # insert data bits 7:0
+    or  t0, t0, a0           # insert data bits 7:0
     li  t1, 0x10004000       # Addr of LCD
     sw  t0, 0(t1)             # write to LCD
 
@@ -174,7 +174,7 @@ lcd_cmd:
 
     lui t0, 0x80000          # bit 31 = 1
     ori t0, t0, 0x0000        # 000 0000 0000
-    ori t0, t0, a0           # insert data bits 7:0
+    or  t0, t0, a0           # insert data bits 7:0
     li  t1, 0x10004000       # Addr of LCD
     sw  t0, 0(t1)            # write to LCD
 
