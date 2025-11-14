@@ -88,6 +88,7 @@ lcd_char:
     # R/W = 0 (write)           [8]
     # a0 = data (command)       [7:0]
 
+    lw a0, 8(sp)
     lui t0, 0x80000          # bit 31 = 1
     ori t0, t0, 0x0200       # 010 0000 0000
     or  t0, t0, a0           # insert data bits 7:0
@@ -171,7 +172,7 @@ lcd_cmd:
     # RS  = 0 (command mode)    [9]
     # R/W = 0 (write)           [8]
     # a0 = data (command)       [7:0]
-
+    lw a0, 8(sp)
     lui t0, 0x80000          # bit 31 = 1
     ori t0, t0, 0x0000        # 000 0000 0000
     or  t0, t0, a0           # insert data bits 7:0
@@ -204,7 +205,7 @@ delay_ms:
     sw ra, 12(sp)
 
     li t0, 0
-    li t1, 25000
+    li t1, 0
     li t2, 0
 delay_ms_loop:
     addi t0, t0, 1
@@ -212,6 +213,7 @@ delay_ms_loop:
 
     li t0, 0
     addi t2, t2, 1
+    li a0, 0
     blt t2, a0, delay_ms_loop
 
     # Restore registers
