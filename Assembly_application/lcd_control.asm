@@ -1,5 +1,7 @@
+# Setting stack frame using for all functions
+ li sp, 0x000007FC # max 0x000007FF 
 
-# Main
+# Initial main
 jal ra, lcd_init
 li a0, 'A'
 jal ra, lcd_char
@@ -7,6 +9,7 @@ li a0, 0xC0
 jal ra, lcd_cmd
 li a0, 'B'
 jal ra, lcd_char
+# Loop main
 loop:
     j loop
 
@@ -17,7 +20,8 @@ loop:
 # Inputs  : 
 # -----------------------------------------------------
 lcd_init:    
-    li sp, 0x00000700 # max 0x000007FF
+    # Allocate stack (8 bytes)
+    addi sp, sp, -8
     sw a0, 0(sp)
     sw ra, 4(sp)
 
@@ -34,71 +38,87 @@ lcd_init:
     li a0, 0x80
     jal ra, lcd_cmd
 
-    li sp, 0x00000700 # max 0x000007FF
+    # Restore registers
     lw a0, 0(sp)
     lw ra, 4(sp)
+    addi sp, sp, 8
+
     ret
 # -----------------------------------------------------
 # Function: lcd_char
 # Purpose : Send data to LCD (for characters)
 # Inputs  : a0 = data (8-bit)
 # -----------------------------------------------------
+# Bits Usage
+# 31 : ON
+# 30 - 11 : (Reserved)
+# 10 : EN
+# 9 : RS
+# 8 : R/W
+# 7 - 0: Data
 lcd_char:
-    li sp, 0x00000700 # max 0x000007FF
-    sw t3, 0(sp)
-    sw t4, 4(sp)
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     sw a0, 8(sp)
-    sw a1, 12(sp)
-    sw a2, 16(sp)
-    sw a3, 20(sp)
-    sw a4, 24(sp)
-    sw ra, 28(sp)
-
-    li t4, 0x10004000   # Addr of LCD
-    mv t3, a0            # Preserve original data
+    sw ra, 12(sp)
 
     # --- Step 1: Send with EN = 1 ---
-    mv a0, t3            # a0 = data
-    li a1, 0             # R/W = 0 (write)
-    li a2, 1             # RS  = 1 (data mode)
-    li a3, 1             # EN  = 1 (enable high)
-    li a4, 1             # ON  = 1 (LCD on)
-    jal ra, make_lcd_word
-    sw a0, 0(t4)         # write to LCD
+    # ON  = 1 (LCD on)          [31]
+    # Resever                   [30:11]
+    # EN  = 1 (enable high)     [10]
+    # RS  = 1 (data mode)       [9]
+    # R/W = 0 (write)           [8]
+    # a0 = data (command)       [7:0]
+    lui t0, 0x80000          # bit 31 = 1
+    ori t0, t0, 0x0600       # 110 0000 0000
+    ori t0, t0, a0           # insert data bits 7:0
+    li  t1, 0x10004000       # Addr of LCD
+    sw  t0, 0(t1)            # write to LCD
 
     li a0, 1             # delay 1ms
     jal ra, delay_ms
 
     # --- Step 2: Send with EN = 0 ---
-    mv a0, t3            # restore data
-    li a1, 0             # R/W = 0
-    li a2, 1             # RS  = 1 (data mode)
-    li a3, 0             # EN  = 0 (disable)
-    li a4, 1             # ON  = 1
-    jal ra, make_lcd_word
-    sw a0, 0(t4)         # write to LCD again
+    # ON  = 1 (LCD on)          [31]
+    # Resever                   [30:11]
+    # EN  = 0 (enable low)      [10]
+    # RS  = 1 (data mode)       [9]
+    # R/W = 0 (write)           [8]
+    # a0 = data (command)       [7:0]
+
+    lui t0, 0x80000          # bit 31 = 1
+    ori t0, t0, 0x0200       # 010 0000 0000
+    ori t0, t0, a0           # insert data bits 7:0
+    li  t1, 0x10004000       # Addr of LCD
+    sw  t0, 0(t1)            # write to LCD
 
     li a0, 5             # delay 5ms
     jal ra, delay_ms
 
-    li sp, 0x00000700 # max 0x000007FF
-    lw t3, 0(sp)
-    lw t4, 4(sp)
+     # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
     lw a0, 8(sp)
-    lw a1, 12(sp)
-    lw a2, 16(sp)
-    lw a3, 20(sp)
-    lw a4, 24(sp)
-    lw ra, 28(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
+
     ret
-
-
 
 # -----------------------------------------------------
 # Function: lcd_cmd
 # Purpose : Send command to LCD
 # Inputs  : a0 = command (8-bit)
 # -----------------------------------------------------
+# Bits Usage
+# 31 : ON
+# 30 - 11 : (Reserved)
+# 10 : EN
+# 9 : RS
+# 8 : R/W
+# 7 - 0: Data
+
 # List command
 # Sr |  Hex-Code |  Command to LCD instruction Register
 # 1	    01	        Clear display screen
@@ -120,94 +140,54 @@ lcd_char:
 # 17	C0	        Force cursor to the beginning ( 2nd line)
 
 lcd_cmd:
-    li sp, 0x00000700 # max 0x000007FF
-    sw t3, 0(sp)
-    sw t4, 4(sp)
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
     sw a0, 8(sp)
-    sw a1, 12(sp)
-    sw a2, 16(sp)
-    sw a3, 20(sp)
-    sw a4, 24(sp)
-    sw ra, 28(sp)
-
-    li t4, 0x10004000   # Addr of LCD
-    mv t3, a0            # Preserve original command in t3
+    sw ra, 12(sp)
 
     # --- Step 1: Send with EN = 1 ---
-    mv a0, t3            # a0 = data (command)
-    li a1, 0             # R/W = 0 (write)
-    li a2, 0             # RS  = 0 (command mode)
-    li a3, 1             # EN  = 1 (enable high)
-    li a4, 1             # ON  = 1 (LCD on)
-    jal ra, make_lcd_word
-    sw a0, 0(t4)         # write to LCD
+    # ON  = 1 (LCD on)          [31]
+    # Resever                   [30:11]
+    # EN  = 1 (enable high)     [10]
+    # RS  = 0 (command mode)    [9]
+    # R/W = 0 (write)           [8]
+    # a0 = data (command)       [7:0]
 
-    li a0, 1             # delay 1ms
+    lui t0, 0x80000          # bit 31 = 1
+    ori t0, t0, 0x0400       # 100 0000 0000
+    ori t0, t0, a0           # insert data bits 7:0
+    li  t1, 0x10004000       # Addr of LCD
+    sw  t0, 0(t1)             # write to LCD
+
+    li a0, 1                 # delay 1ms
     jal ra, delay_ms
 
     # --- Step 2: Send with EN = 0 ---
-    mv a0, t3            # restore command
-    li a1, 0             # R/W = 0
-    li a2, 0             # RS  = 0
-    li a3, 0             # EN  = 0 (disable)
-    li a4, 1             # ON  = 1
-    jal ra, make_lcd_word
-    sw a0, 0(t4)         # write to LCD again
+    # ON  = 1 (LCD on)          [31]
+    # Resever                   [30:11]
+    # EN  = 0 (enable low)      [10]
+    # RS  = 0 (command mode)    [9]
+    # R/W = 0 (write)           [8]
+    # a0 = data (command)       [7:0]
 
-    li a0, 5             # delay 5ms
+    lui t0, 0x80000          # bit 31 = 1
+    ori t0, t0, 0x0000        # 000 0000 0000
+    ori t0, t0, a0           # insert data bits 7:0
+    li  t1, 0x10004000       # Addr of LCD
+    sw  t0, 0(t1)            # write to LCD
+
+    li a0, 5                 # delay 5ms
     jal ra, delay_ms
 
-    li sp, 0x00000700 # max 0x000007FF
-    lw t3, 0(sp)
-    lw t4, 4(sp)
-    lw a0, 8(sp)
-    lw a1, 12(sp)
-    lw a2, 16(sp)
-    lw a3, 20(sp)
-    lw a4, 24(sp)
-    lw ra, 28(sp)
-    ret
-
-
-# =====================================================
-# Function: make_lcd_word(data, rw, rs, en, on)
-# Purpose : Build 32-bit LCD control word
-# Inputs:
-#   a0 = data (bits [7:0])
-#   a1 = rw   (bit 8)
-#   a2 = rs   (bit 9)
-#   a3 = en   (bit 10)
-#   a4 = on   (bit 31)
-# Output:
-#   a0 = packed 32-bit LCD word
-# =====================================================
-make_lcd_word:
-    li sp, 0x00000700 # max 0x000007FF
-    sw t0, 0(sp)
-    sw a1, 4(sp)
-    sw a2, 8(sp)
-    sw a3, 12(sp)
-    sw a4, 16(sp)
-    sw ra, 20(sp)
-
-    mv   t0, a0          # start with data in t0
-    slli a1, a1, 8       # shift R/W
-    slli a2, a2, 9       # shift RS
-    slli a3, a3, 10      # shift EN
-    slli a4, a4, 31      # shift ON
-    or   t0, t0, a1
-    or   t0, t0, a2
-    or   t0, t0, a3
-    or   t0, t0, a4
-    mv   a0, t0
-
-    li sp, 0x00000700 # max 0x000007FF
+     # Restore registers
     lw t0, 0(sp)
-    lw a1, 4(sp)
-    lw a2, 8(sp)
-    lw a3, 12(sp)
-    lw a4, 16(sp)
-    lw ra, 20(sp)
+    lw t1, 4(sp)
+    lw a0, 8(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
+
     ret
 
 # -----------------------------------------------------
@@ -216,7 +196,8 @@ make_lcd_word:
 # Inputs  : a0 = ms
 # -----------------------------------------------------
 delay_ms:
-    li sp, 0x00000700 # max 0x000007FF
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
     sw t0, 0(sp)
     sw t1, 4(sp)
     sw t2, 8(sp)
@@ -233,15 +214,13 @@ delay_ms_loop:
     addi t2, t2, 1
     blt t2, a0, delay_ms_loop
 
-    lw t0, 0(sp)
-    lw t1, 4(sp)
-    lw t2, 0(sp)
-
-    li sp, 0x00000700 # max 0x000007FF
+    # Restore registers
     lw t0, 0(sp)
     lw t1, 4(sp)
     lw t2, 8(sp)
     lw ra, 12(sp)
+    addi sp, sp, 16
+
     ret
 # -----------------------------------------------------
 # Function: delay_us(a0)
@@ -249,7 +228,8 @@ delay_ms_loop:
 # Inputs  : a0 = us
 # -----------------------------------------------------
 delay_us:
-    li sp, 0x00000700 # max 0x000007FF
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
     sw t0, 0(sp)
     sw t1, 4(sp)
     sw t2, 8(sp)
@@ -266,9 +246,11 @@ delay_us_loop:
     addi t2, t2, 1
     blt t2, a0, delay_us_loop
 
-    li sp, 0x00000700 # max 0x000007FF
+    # Restore registers
     lw t0, 0(sp)
     lw t1, 4(sp)
     lw t2, 8(sp)
     lw ra, 12(sp)
+    addi sp, sp, 16
+
     ret
