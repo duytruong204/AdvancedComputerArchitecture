@@ -205,7 +205,7 @@ delay_ms:
     sw ra, 12(sp)
 
     li t0, 0
-    li t1, 0
+    li t1, 25000
     li t2, 0
 delay_ms_loop:
     addi t0, t0, 1
@@ -213,7 +213,6 @@ delay_ms_loop:
 
     li t0, 0
     addi t2, t2, 1
-    li a0, 0
     blt t2, a0, delay_ms_loop
 
     # Restore registers
