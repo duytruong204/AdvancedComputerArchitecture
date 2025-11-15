@@ -31,22 +31,6 @@ module regfile(
 	
 endmodule
 
-
-module d_flip_flop_32bit(
-	input wire			i_clk,
-	input wire			i_reset,
-	input wire [31:0] i_d,
-	output reg [31:0] o_q
-);
-	always @(posedge i_clk or negedge i_reset) begin
-		if(!i_reset) begin
-			o_q <= 32'b0;
-		end else begin
-			o_q <= i_d;
-		end
-	end
-endmodule
-
 module d_flip_flop_32x32bit (
 	input  wire 		i_clk,
 	input  wire 		i_reset,
@@ -64,17 +48,12 @@ module d_flip_flop_32x32bit (
 	genvar i;
 	generate
 		for (i = 1; i < 32; i = i + 1) begin: gen_register_bank
-			d_flip_flop_32bit ff_32ibt (
+			d_flip_flop #(.DATA_WIDTH(32)) d_flip_flop_32bit (
 				.i_clk(i_clk), 
-				.i_reset(i_reset), 
-				.i_d(w_next_data[i]), 
+				.i_reset(i_reset),
+				.i_en(i_write_enable & i_write_addr_onehot[i]),
+				.i_d(i_write_data), 
 				.o_q(o_registers[i])
-			);
-			mux_2to1_32bit mux_2to1_32bit (
-				.i_in0(o_registers[i]),     
-				.i_in1(i_write_data),      
-				.i_sel(i_write_enable & i_write_addr_onehot[i]), 
-				.o_out(w_next_data[i])
 			);
 		end
 	endgenerate

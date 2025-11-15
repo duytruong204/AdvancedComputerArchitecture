@@ -27,6 +27,7 @@
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/equal_32bit.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/01_operation/equal_20bit.sv"
 // memory
+`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/02_memory/d_flip_flop.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/02_memory/memory.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/02_memory/single_port_ram.sv"
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/00_common/02_memory/memory_ram.sv"

@@ -1,8 +1,8 @@
 `timescale 1ns/1ps
-`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/include.sv"
+//`include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/include.sv"
 `define RESET_PERIOD 100
 `define CLK_PERIOD   2
-`define FINISH       40_000
+`define FINISH       40000
 
 module singlecycle_tb;
 	reg  [31:0]  i_io_sw  ;
@@ -21,7 +21,6 @@ module singlecycle_tb;
 	wire 		o_insn_vld;
 	reg	i_clk;
 	reg i_reset;
-
 
 	// Hex display decoder
 	function string display_hex(input [6:0] hex);
@@ -85,6 +84,9 @@ module singlecycle_tb;
 		$finish;
 	end
 	integer i, j;
+	// always @ (o_io_lcd) begin
+	// 	$display("%8h", o_io_lcd);
+	// end
 	// Show pc and instruction
 	always @ (o_pc_debug) begin
 		// Show pc and instruction
@@ -95,31 +97,31 @@ module singlecycle_tb;
 		// Show all registers
 		for (i = 0; i < 8; i = i + 1) begin
 			$display("R%0d = %8h | R%0d = %8h | R%0d = %8h | R%0d = %8h", 
-			i*4+0, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*2+0],
-			i*4+1, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*2+1],
-			i*4+2, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*2+2],
-			i*4+3, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*2+3]
+			i*4+0, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*4+0],
+			i*4+1, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*4+1],
+			i*4+2, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*4+2],
+			i*4+3, single_cycle.regfile.d_flip_flop_32x32bit.o_registers[i*4+3]
 			);
 		end
 		// Show first 32 memory locations
 		for (i = 0; i < 9; i = i + 1) begin
 			$display("M%0d = %2h %2h %2h %2h | M%0d = %2h %2h %2h %2h | M%0d = %2h %2h %2h %2h | M%0d = %2h %2h %2h %2h", 
-				i*4+0, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[2*i+0], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[2*i+0], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[2*i+0], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[2*i+0],
-				i*4+1, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[2*i+1], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[2*i+1], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[2*i+1], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[2*i+1],
-				i*4+2, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[2*i+2], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[2*i+2], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[2*i+2], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[2*i+2],
-				i*4+3, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[2*i+3], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[2*i+3], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[2*i+3], 
-						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[2*i+3]
+				i*4+0, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[4*i+0], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[4*i+0], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[4*i+0], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[4*i+0],
+				i*4+1, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[4*i+1], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[4*i+1], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[4*i+1], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[4*i+1],
+				i*4+2, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[4*i+2], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[4*i+2], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[4*i+2], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[4*i+2],
+				i*4+3, 	single_cycle.lsu.internal_memory.internal_memory.ram_col_3.r_ram[4*i+3], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_2.r_ram[4*i+3], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_1.r_ram[4*i+3], 
+						single_cycle.lsu.internal_memory.internal_memory.ram_col_0.r_ram[4*i+3]
 			);
 		end
 
@@ -127,6 +129,7 @@ module singlecycle_tb;
 		$display("LEDG = %8h, LEDR = %8h, LCD = %8h", 
 			o_io_ledg, o_io_ledr, o_io_lcd
 		);
+		// Show hex displays
 		$display("HEX7 = %2h, HEX6 = %2h, HEX5 = %2h, HEX4 = %2h, HEX3 = %2h, HEX2 = %2h, HEX1 = %2h, HEX0 = %2h", 
 			o_io_hex7, o_io_hex6, o_io_hex5, o_io_hex4,
 			o_io_hex3, o_io_hex2, o_io_hex1, o_io_hex0
@@ -142,12 +145,25 @@ module singlecycle_tb;
 			display_hex(o_io_hex1),
 			display_hex(o_io_hex0)
 		);
+		$display("alu_data = %8h, from ALU: op_a = %8h, op_b = %8h",
+			single_cycle.alu.o_alu_data,
+			single_cycle.alu.i_op_a,
+			single_cycle.alu.i_op_b
+		);
+		$display("a_sel = %b, a_out = %8h, b_sel = %b, b_out = %8h",
+			single_cycle.mux_a_sel.i_sel,
+			single_cycle.mux_a_sel.o_out,
+			single_cycle.mux_b_sel.i_sel,
+			single_cycle.mux_b_sel.o_out
+		);
+
+		// Finish simulation if instruction not valid
 		if(o_insn_vld == 0) begin
 			$display("Instruction not valid yet.");
 			$finish;
 		end
 		$display("==============================");
 	end
-	
+
 endmodule
 

@@ -204,10 +204,12 @@ module ouput_peripheral_memory(
 		.i_wdata(i_write_data),
 		.o_rdata(o_lcd_data)
 	);
-	d_latch_32bit lcd_control_latch (
+	
+	d_flip_flop #(.DATA_WIDTH(32)) lcd_control_dff (
+		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(w_lcd_write_enable),
-		.i_d(o_lcd_data),
+		.i_d(i_write_data),
 		.o_q(o_lcd_out)
 	);
 
@@ -221,10 +223,11 @@ module ouput_peripheral_memory(
 		.i_wdata(i_write_data),
 		.o_rdata(o_hexh_data)
 	);
-	d_latch_32bit seven_segment_leds_7to4_latch (
+	d_flip_flop #(.DATA_WIDTH(32)) seven_segment_leds_7to4_dff (
+		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(w_hexh_write_enable),
-		.i_d(o_hexh_data),
+		.i_d(i_write_data),
 		.o_q(o_hexh_out)
 	);
 
@@ -238,10 +241,11 @@ module ouput_peripheral_memory(
 		.i_wdata(i_write_data),
 		.o_rdata(o_hexl_data)
 	);
-	d_latch_32bit seven_segment_leds_3to0_latch (
+	d_flip_flop #(.DATA_WIDTH(32)) seven_segment_leds_3to0_dff (
+		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(w_hexl_write_enable),
-		.i_d(o_hexl_data),
+		.i_d(i_write_data),
 		.o_q(o_hexl_out)
 	);
 
@@ -255,10 +259,11 @@ module ouput_peripheral_memory(
 		.i_wdata(i_write_data),
 		.o_rdata(o_ledg_data)
 	);
-	d_latch_32bit green_leds_latch (
+	d_flip_flop #(.DATA_WIDTH(32)) green_leds_dff (
+		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(w_ledg_write_enable),
-		.i_d(o_ledg_data),
+		.i_d(i_write_data),
 		.o_q(o_ledg_out)
 	);
 
@@ -272,10 +277,11 @@ module ouput_peripheral_memory(
 		.i_wdata(i_write_data),
 		.o_rdata(o_ledr_data)
 	);
-	d_latch_32bit red_leds_latch (
+	d_flip_flop #(.DATA_WIDTH(32)) red_leds_dff (
+		.i_clk(i_clk),
 		.i_reset(i_reset),
 		.i_en(w_ledr_write_enable),
-		.i_d(o_ledr_data),
+		.i_d(i_write_data),
 		.o_q(o_ledr_out)
 	);
 
@@ -303,21 +309,6 @@ module input_peripheral_memory(
 		.o_rdata(o_sw_data)
 	);
 
-endmodule
-
-module d_latch_32bit(
-	input  wire 		i_reset,
-	input  wire 		i_en,
-	input  wire [31:0] 	i_d,
-	output reg  [31:0] 	o_q
-);
-	always @(*) begin
-		if(!i_reset) begin
-			o_q <= 32'b0;
-		end else if(i_en) begin
-			o_q <= i_d;
-		end
-	end
 endmodule
 
 module mux_by_enable_32bit(
