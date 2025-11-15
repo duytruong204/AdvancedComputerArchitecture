@@ -44,6 +44,11 @@ reset:
     j loop
 
 declare_variable:
+    # Allocate stack (8 bytes)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+
     # -------------------------------------------------
     # Digit table (0–F), stored at 0x00000000
     # Each entry = 1 byte, aligned to 4 bytes for sw
@@ -93,53 +98,72 @@ declare_variable:
     sw t1, 8(t0)            # Seconds ten
     sw t1, 12(t0)           # Seconds one
 
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     ret
+
 # -----------------------------------------------------
-# Function: Display 7 segment led
-# Purpose : 
-# Inputs  : a0 = digit 0
-#           a1 = digit 1
-#           a2 = digit 2
-#           a3 = digit 3
-# Output:Display
+# Function: Display 7 segment LED
+# Inputs  : a0 = digit0 (minutes ten)
+#           a1 = digit1 (minutes one)
+#           a2 = digit2 (seconds ten)
+#           a3 = digit3 (seconds one)
 # -----------------------------------------------------
 hex_led_display:
-    li   t4, 0x00000000      # Base address of digit table
-    li   t5, 0               # Clear accumulator (final display value)
+    # Allocate stack (20 bytes)
+    addi sp, sp, -20
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t4, 8(sp)
+    sw t5, 12(sp)
+    sw ra, 16(sp)
 
-    # --- Digit a0: minutes ten ---
-    slli t0, a0, 2           # offset = a0 * 4
-    add  t0, t0, t4          # actual address
-    lw   t1, 0(t0)           # load pattern
-    slli t1, t1, 24          # shift to [31:24]
-    or   t5, t5, t1          # add into result
+    # Load address of digit pattern table
+    la   t4, digit_table      # <<< FIXED
+    li   t5, 0                # Clear accumulator
 
-    # --- Digit a1: minutes one ---
+    # --- Digit a0 ---
+    slli t0, a0, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    slli t1, t1, 24
+    or   t5, t5, t1
+
+    # --- Digit a1 ---
     slli t0, a1, 2
     add  t0, t0, t4
     lw   t1, 0(t0)
-    slli t1, t1, 16          # shift to [23:16]
+    slli t1, t1, 16
     or   t5, t5, t1
 
-    # --- Digit a2: seconds ten ---
+    # --- Digit a2 ---
     slli t0, a2, 2
     add  t0, t0, t4
     lw   t1, 0(t0)
-    slli t1, t1, 8           # shift to [15:8]
+    slli t1, t1, 8
     or   t5, t5, t1
 
-    # --- Digit a3: seconds one ---
+    # --- Digit a3 ---
     slli t0, a3, 2
     add  t0, t0, t4
     lw   t1, 0(t0)
-    or   t5, t5, t1          # [7:0]
+    or   t5, t5, t1
 
-    # --- Output to LED ---
+    # Write to LED register
     li   t0, 0x10002000
     sw   t5, 0(t0)
 
-    ret
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t4, 8(sp)
+    lw t5, 12(sp)
+    lw ra, 16(sp)
+    addi sp, sp, 20
 
+    ret
 
 # -----------------------------------------------------
 # Function: Watch
@@ -154,6 +178,12 @@ hex_led_display:
 #           a3 = Seconds one
 # -----------------------------------------------------
 watch_run:
+    # Allocate stack (12 bytes)
+    addi sp, sp, -12
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw ra, 8(sp)
+
     li t0, 9        # one limit
     li t1, 6        # ten limit
 
@@ -182,6 +212,12 @@ watch_run:
     # Reset minutes ten (rollover at 60:00)
     addi a0, x0, 0
 watch_end:
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw ra, 8(sp)
+    addi sp, sp, 12
+
     ret
 
 # -----------------------------------------------------
@@ -192,10 +228,11 @@ watch_end:
 #           a1 = Reset
 # -----------------------------------------------------
 read_sw:
-    # Allocate stack (8 bytes)
-    addi sp, sp, -8
+    # Allocate stack (12 bytes)
+    addi sp, sp, -12
     sw t0, 0(sp)
     sw t1, 4(sp)
+    sw ra, 8(sp)
     
     mv t0, a0
     lw t1, 0(t0)
@@ -208,7 +245,8 @@ read_sw:
     # Restore registers
     lw t0, 0(sp)
     lw t1, 4(sp)
-    addi sp, sp, 8
+    sw ra, 8(sp)
+    addi sp, sp, 12
     ret
 
 # -----------------------------------------------------
