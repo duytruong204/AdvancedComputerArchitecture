@@ -12,12 +12,16 @@ loop:
 # Purpose : Read SW
 # Inputs  : a0 = SW address
 #           a1 = HexNumber
-# Outputs : a0 = BinNumber
-#           a1 = DecNumber
+# Outputs : a1 = HexNumber
+#           a2 = BinNumber
+#           a3 = DecNumber
 # -----------------------------------------------------
 read_sw:
     # Allocate stack (12 bytes)
-    # later
+    addi sp, sp, -12
+    sw a0, 8(sp)
+    sw ra, 12(sp)
+  
 
     # infor: 
     # decConvert    SW7 
@@ -29,57 +33,57 @@ read_sw:
     # incrDigit     SW1
     # reduDigit     SW0
    
-    # get sw input
-    mv t0, a0
+# get SW0 input, reduce hex digit
+    lw t0, 8(sp)
     lw t1, 0(t0)
     li t2, 0x1
     addi t1, t1, 0x1
     bne, t1, t2, jump_sw1
 
 jump_sw1:
-    mv t0, a0
+    lw t0, 8(sp)
     lw t1, 1(t0)
     li t2, 0x1
     addi t1, t1, 0x1
     bne, t1, t2, jump_sw2
 
 jump_sw2:
-    mv t0, a0
+    lw t0, 8(sp)
     lw t1, 2(t0)
     li t2, 0x1
     addi t1, t1, 0x1
     bne, t1, t2, jump_sw3
 
 jump_sw3:
-    mv t0, a0
+    lw t0, 8(sp)
     lw t1, 3(t0)
     li t2, 0x1
     addi t1, t1, 0x1
     bne, t1, t2, jump_sw4
 
 jump_sw4:
-    mv t0, a0
+    lw t0, 8(sp)
     lw t1, 4(t0)
     li t2, 0x1
     addi t1, t1, 0x1
     bne, t1, t2, jump_sw5
 
 jump_sw5:
-    mv t0, a0
+    lw t0, 8(sp)
     lw t1, 5(t0)
     li t2, 0x1
     addi t1, t1, 0x1
     bne, t1, t2, jump_sw6
 
 jump_sw6:
-    mv t0, a0
+    lw t0, 8(sp)
     lw t1, 6(t0)
     li t2, 0x1
     addi t1, t1, 0x1
     bne, t1, t2, jump_sw7
 
 jump_sw7:
-    mv t0, a0
+    lw t0, 8(sp)
     lw t1, 2(t0)
     li t2, 0x1
     addi t1, t1, 0x1
