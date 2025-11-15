@@ -199,11 +199,18 @@ read_sw:
     ret
 
 # -----------------------------------------------------
-# Function: delay_ms
+# Function: delay_ms(a0)
 # Purpose : delay
 # Inputs  : a0 = ms
 # -----------------------------------------------------
 delay_ms:
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw ra, 12(sp)
+
     li t0, 0
     li t1, 25000
     li t2, 0
@@ -214,14 +221,28 @@ delay_ms_loop:
     li t0, 0
     addi t2, t2, 1
     blt t2, a0, delay_ms_loop
-    ret
 
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
+
+    ret
 # -----------------------------------------------------
-# Function: delay_us
+# Function: delay_us(a0)
 # Purpose : delay
 # Inputs  : a0 = us
 # -----------------------------------------------------
 delay_us:
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw ra, 12(sp)
+
     li t0, 0
     li t1, 25
     li t2, 0
@@ -232,5 +253,12 @@ delay_us_loop:
     li t0, 0
     addi t2, t2, 1
     blt t2, a0, delay_us_loop
+
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
+
     ret
-    
