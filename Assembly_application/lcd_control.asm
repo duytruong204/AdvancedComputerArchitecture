@@ -25,6 +25,8 @@ lcd_init:
     sw a0, 0(sp)
     sw ra, 4(sp)
 
+    li a0, 0x0
+    jal ra, lcd_cmd
     li a0, 20             # delay 20ms
     jal ra, delay_ms
     li a0, 0x38
