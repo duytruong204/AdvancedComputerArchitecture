@@ -1,3 +1,6 @@
+# Setting stack frame using for all functions
+ li sp, 0x000007FC # max 0x000007FF 
+
 # Initiate
 jal ra, declare_variable
 
