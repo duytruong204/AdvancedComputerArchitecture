@@ -121,8 +121,8 @@ hex_led_display:
     sw ra, 16(sp)
 
     # Load address of digit pattern table
-    la   t4, digit_table      # <<< FIXED
-    li   t5, 0                # Clear accumulator
+    li   t4, 0x00000000      
+    li   t5, 0
 
     # --- Digit a0 ---
     slli t0, a0, 2
