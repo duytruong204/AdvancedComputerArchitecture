@@ -192,6 +192,11 @@ watch_end:
 #           a1 = Reset
 # -----------------------------------------------------
 read_sw:
+    # Allocate stack (8 bytes)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    
     mv t0, a0
     lw t1, 0(t0)
     mv a0, t1
@@ -199,6 +204,11 @@ read_sw:
     mv a1, t1
     srli a1, a1, 1
     andi a1, a1, 0x1
+
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
     ret
 
 # -----------------------------------------------------
