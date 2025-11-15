@@ -14,7 +14,7 @@ module single_cycle(
 	output wire	[6:0]  	o_io_hex6,
 	output wire	[6:0]  	o_io_hex7,
 	output wire [31:0] 	o_pc_debug,
-	output wire 		 	o_insn_vld
+	output wire 		o_insn_vld
 );
 	wire [31:0] w_pc, w_pc_4, w_pc_new;
 	wire [31:0] w_inst;
@@ -40,9 +40,6 @@ module single_cycle(
 	wire [2:0]	w_type_access;
 	wire		w_mem_rw;
 	wire [1:0]	w_wb_sel;
-
-	// Stalling for LSU
-	wire w_lsu_load_stall;
 
 	pc pc(
 		.i_clk(i_clk),
