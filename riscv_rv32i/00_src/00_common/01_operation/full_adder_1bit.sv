@@ -7,8 +7,8 @@ module full_adder_1bit (
 	output wire o_sum,	// Sum output
 	output wire o_carry	// Carry-out
 );
-	assign o_sum 	= i_a ^ i_b ^ i_carry;
-
-	assign o_carry 	= (i_a & i_b) | (i_b & i_carry) | (i_a & i_carry);
+	wire w_xor_ab = i_a ^ i_b;
+	assign o_sum 	= w_xor_ab ^ i_carry;
+	assign o_carry 	= (i_a & i_b) | (i_carry & w_xor_ab);
 
 endmodule

@@ -1,4 +1,4 @@
-module single_cycle(
+module pipelined(
 	input  wire 		i_clk,
 	input  wire 		i_reset,
 	input  wire	[31:0]	i_io_sw,
@@ -76,7 +76,7 @@ module single_cycle(
 	);
 	
 	imm_gen imm_gen(
-		.i_inst(w_inst[31:7]),
+		.i_inst(w_inst),
 		.i_imm_sel(w_imm_sel),
 		.o_imm(w_imm)
 	);

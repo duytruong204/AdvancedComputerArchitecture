@@ -1,5 +1,5 @@
 module imm_gen(
-	input  wire [31:0] i_inst,
+	input  wire [31:7] i_inst,
 	input  wire [4:0]  i_imm_sel,
 	output wire [31:0] o_imm
 );

@@ -2,7 +2,7 @@
 `include "D:/Application/altera/13.0sp1/Project/Single_Cycle_RISC_V/riscv_rv32i/00_src/include.sv"
 `define RESET_PERIOD 100
 `define CLK_PERIOD   2
-`define FINISH       40000
+`define FINISH       400000000
 
 module singlecycle_tb;
 	reg  [31:0]  i_io_sw  ;
