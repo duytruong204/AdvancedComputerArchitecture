@@ -31,14 +31,24 @@ lcd_init:
     jal ra, delay_ms
     li a0, 0x38
     jal ra, lcd_cmd
+    li a0, 20             # delay 20ms
+    jal ra, delay_ms
     li a0, 0x0C
     jal ra, lcd_cmd
+    li a0, 20             # delay 20ms
+    jal ra, delay_ms
     li a0, 0x06
     jal ra, lcd_cmd
+    li a0, 20             # delay 20ms
+    jal ra, delay_ms
     li a0, 0x01
     jal ra, lcd_cmd
+    li a0, 20             # delay 20ms
+    jal ra, delay_ms
     li a0, 0x80
     jal ra, lcd_cmd
+    li a0, 20             # delay 20ms
+    jal ra, delay_ms
 
     # Restore registers
     lw a0, 0(sp)
