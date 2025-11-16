@@ -3,17 +3,23 @@
 
 # Initial main
 jal ra, lcd_init
-li a0, 'T'
-jal ra, lcd_char
-li a0, 'R'
-jal ra, lcd_char
-li a0, 'U'
+li a0, 'H'
 jal ra, lcd_char
 li a0, 'O'
 jal ra, lcd_char
 li a0, 'N'
 jal ra, lcd_char
 li a0, 'G'
+jal ra, lcd_char
+li a0, ' '
+jal ra, lcd_char
+li a0, 'H'
+jal ra, lcd_char
+li a0, 'I'
+jal ra, lcd_char
+li a0, 'E'
+jal ra, lcd_char
+li a0, 'P'
 jal ra, lcd_char
 
 li a0, 0xC0
