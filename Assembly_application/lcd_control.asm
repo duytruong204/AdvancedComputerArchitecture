@@ -42,6 +42,10 @@ lcd_init:
     jal ra, lcd_cmd
     li a0, 0x01
     jal ra, lcd_cmd
+
+    li a0, 5             # delay 5ms
+    jal ra, delay_ms
+
     li a0, 0x80
     jal ra, lcd_cmd
 
