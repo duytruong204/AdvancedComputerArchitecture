@@ -3,12 +3,36 @@
 
 # Initial main
 jal ra, lcd_init
-li a0, 'A'
+li a0, 'T'
 jal ra, lcd_char
+li a0, 'R'
+jal ra, lcd_char
+li a0, 'U'
+jal ra, lcd_char
+li a0, 'O'
+jal ra, lcd_char
+li a0, 'N'
+jal ra, lcd_char
+li a0, 'G'
+jal ra, lcd_char
+
 li a0, 0xC0
 jal ra, lcd_cmd
-li a0, 'B'
+li a0, 'D'
 jal ra, lcd_char
+li a0, 'U'
+jal ra, lcd_char
+li a0, 'C'
+jal ra, lcd_char
+li a0, ' '
+jal ra, lcd_char
+li a0, 'D'
+jal ra, lcd_char
+li a0, 'U'
+jal ra, lcd_char
+li a0, 'Y'
+jal ra, lcd_char
+
 # Loop main
 loop:
     j loop
