@@ -21,39 +21,36 @@ loop:
 # -----------------------------------------------------
 lcd_init:    
     # Allocate stack (8 bytes)
-    addi sp, sp, -8
-    sw a0, 0(sp)
-    sw ra, 4(sp)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw a0, 8(sp)
+    sw ra, 12(sp)
 
-    li a0, 0x0
-    jal ra, lcd_cmd
+    lui t0, 0x80000
+    li  t1, 0x10004000       # Addr of LCD
+    sw  t0, 0(t1)            # write to LCD
+
     li a0, 20             # delay 20ms
     jal ra, delay_ms
+
     li a0, 0x38
     jal ra, lcd_cmd
-    li a0, 20             # delay 20ms
-    jal ra, delay_ms
     li a0, 0x0C
     jal ra, lcd_cmd
-    li a0, 20             # delay 20ms
-    jal ra, delay_ms
     li a0, 0x06
     jal ra, lcd_cmd
-    li a0, 20             # delay 20ms
-    jal ra, delay_ms
     li a0, 0x01
     jal ra, lcd_cmd
-    li a0, 20             # delay 20ms
-    jal ra, delay_ms
     li a0, 0x80
     jal ra, lcd_cmd
-    li a0, 20             # delay 20ms
-    jal ra, delay_ms
 
     # Restore registers
-    lw a0, 0(sp)
-    lw ra, 4(sp)
-    addi sp, sp, 8
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw a0, 8(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
 
     ret
 # -----------------------------------------------------
