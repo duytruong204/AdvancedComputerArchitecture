@@ -1,0 +1,373 @@
+# Setting stack frame using for all functions
+ li sp, 0x000007FC # max 0x000007FF 
+
+# Initiate
+jal ra, declare_variable
+
+# Loop
+loop:
+
+    li a0, 100
+    jal ra, delay_ms
+
+    li s0, 0x00000040 
+    lw a0, 0(s0)
+    lw a1, 4(s0)
+    lw a2, 8(s0)
+    lw a3, 12(s0)
+    lw a4, 16(t0)
+    lw a5, 20(t0)
+    jal ra, hex_led_display
+
+    li a0, 0x10010000
+    jal ra, read_sw
+    li s0, 0x1
+    beq a0, s0, stop
+    beq a1, s0, reset
+
+    li s0, 0x00000040
+    lw a0, 0(s0)           # Minutes ten
+    lw a1, 4(s0)           # Minutes one
+    lw a2, 8(s0)           # Seconds ten
+    lw a3, 12(s0)          # Seconds one
+    lw a4, 16(t0)
+    lw a5, 20(t0)
+    jal ra, watch_run
+    li t0, 0x00000040
+    sw a0, 0(s0)
+    sw a1, 4(s0)
+    sw a2, 8(s0)
+    sw a3, 12(s0)
+    lw a4, 16(t0)
+    lw a5, 20(t0)
+
+    j loop
+
+stop:
+    j loop
+reset:
+    jal ra, declare_variable
+    j loop
+
+declare_variable:
+    # Allocate stack (8 bytes)
+    addi sp, sp, -8
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+
+    # -------------------------------------------------
+    # Digit table (0–F), stored at 0x00000000
+    # Each entry = 1 byte, aligned to 4 bytes for sw
+    # -------------------------------------------------
+    li t0, 0x00000000       # Base address
+    li t1, 0x40             # 0
+    sw t1, 0(t0)
+    li t1, 0x79             # 1
+    sw t1, 4(t0)
+    li t1, 0x24             # 2
+    sw t1, 8(t0)
+    li t1, 0x30             # 3
+    sw t1, 12(t0)
+    li t1, 0x19             # 4
+    sw t1, 16(t0)
+    li t1, 0x12             # 5
+    sw t1, 20(t0)
+    li t1, 0x02             # 6
+    sw t1, 24(t0)
+    li t1, 0x78             # 7
+    sw t1, 28(t0)
+    li t1, 0x00             # 8
+    sw t1, 32(t0)
+    li t1, 0x10             # 9
+    sw t1, 36(t0)
+    li t1, 0x08             # A
+    sw t1, 40(t0)
+    li t1, 0x03             # B
+    sw t1, 44(t0)
+    li t1, 0x46             # C
+    sw t1, 48(t0)
+    li t1, 0x21             # D
+    sw t1, 52(t0)
+    li t1, 0x06             # E
+    sw t1, 56(t0)
+    li t1, 0x0E             # F
+    sw t1, 60(t0)
+
+    
+    # -------------------------------------------------
+    # Time initialization (00:00), stored at 0x00000040
+    # -------------------------------------------------
+    li t0, 0x00000040       # Base address  
+    li t1, 0
+    sw t1, 0(t0)            # Minutes ten
+    sw t1, 4(t0)            # Minutes one
+    sw t1, 8(t0)            # Seconds ten
+    sw t1, 12(t0)           # Seconds one
+    sw t1, 16(t0)           #.Seconds ten    (0–9)
+    sw t1, 20(t0)           #.Seconds one    (0–9)
+
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    addi sp, sp, 8
+    ret
+
+# -----------------------------------------------------
+# Function: hex_led_display
+# Purpose : Display 6 digits on 2 LED registers
+# Inputs  : a0..a5 = digits 0–9 (indexes into pattern table)
+# -----------------------------------------------------
+hex_led_display:
+    # Allocate stack (20 bytes)
+    addi sp, sp, -20
+    sw t0,   0(sp)
+    sw t1,   4(sp)
+    sw t4,   8(sp)
+    sw t5,  12(sp)
+    sw ra,  16(sp)
+
+    # Load digit pattern table base address
+    li  t4, DIGIT_PATTERN_TABLE        # <-- update this constant
+    li  t5, 0                           # accumulator
+
+    # ======================================================
+    # UPPER LED (0x10003000) shows: [a0 a1]
+    #  a0 → upper byte
+    #  a1 → lower byte
+    # ======================================================
+
+    # --- Digit a0 (shift left 8) ---
+    slli t0, a0, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    slli t1, t1, 8
+    or   t5, t5, t1
+
+    # --- Digit a1 (no shift) ---
+    slli t0, a1, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    or   t5, t5, t1
+
+    # Write to LED (minutes)
+    li   t0, 0x10003000
+    sw   t5, 0(t0)
+
+    # ======================================================
+    # LOWER LED (0x10002000) shows: [a2 a3 a4 a5]
+    #  a2 → bits 31..24
+    #  a3 → bits 23..16
+    #  a4 → bits 15.. 8
+    #  a5 → bits  7.. 0
+    # ======================================================
+
+    li  t5, 0
+
+    # --- Digit a2 (shift 24) ---
+    slli t0, a2, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    slli t1, t1, 24
+    or   t5, t5, t1
+
+    # --- Digit a3 (shift 16) ---
+    slli t0, a3, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    slli t1, t1, 16
+    or   t5, t5, t1
+
+    # --- Digit a4 (shift 8) ---
+    slli t0, a4, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    slli t1, t1, 8
+    or   t5, t5, t1
+
+    # --- Digit a5 (shift 0) ---
+    slli t0, a5, 2
+    add  t0, t0, t4
+    lw   t1, 0(t0)
+    or   t5, t5, t1
+
+    # Write to LED (seconds)
+    li   t0, 0x10002000
+    sw   t5, 0(t0)
+
+    # Restore registers
+    lw t0,  0(sp)
+    lw t1,  4(sp)
+    lw t4,  8(sp)
+    lw t5, 12(sp)
+    lw ra, 16(sp)
+    addi sp, sp, 20
+
+    ret
+
+# -----------------------------------------------------
+# Function: watch_run
+# Purpose : Increase time by 0.01 second
+# Inputs  : a0 = Minutes tens
+#           a1 = Minutes ones
+#           a2 = Seconds tens
+#           a3 = Seconds ones
+#           a4 = .Seconds tens    (0–9)
+#           a5 = .Seconds ones    (0–9)
+# Outputs : updated time fields
+# -----------------------------------------------------
+watch_run:
+    # Save registers on stack
+    addi sp, sp, -12
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw ra, 8(sp)
+
+    # -------------------------------------------------
+    # Increment .Seconds ones (a5)
+    # -------------------------------------------------
+    addi a5, a5, 1
+    li   t0, 10
+    blt  a5, t0, watch_end       # if a5 < 10 → done
+
+    # rollover a5
+    li   a5, 0
+    addi a4, a4, 1               # increment .seconds tens
+    blt  a4, t0, watch_end       # if a4 < 10 → done
+
+    # -------------------------------------------------
+    # rollover .Seconds → increment seconds ones (a3)
+    # -------------------------------------------------
+    li   a4, 0
+    addi a3, a3, 1
+    blt  a3, t0, watch_end       # if a3 < 10 → done
+
+    # -------------------------------------------------
+    # rollover seconds ones → increment seconds tens
+    # -------------------------------------------------
+    li   a3, 0
+    addi a2, a2, 1
+    li   t1, 6
+    blt  a2, t1, watch_end       # if a2 < 6 → done
+
+    # -------------------------------------------------
+    # rollover seconds → increment minutes ones
+    # -------------------------------------------------
+    li   a2, 0
+    addi a1, a1, 1
+    li   t0, 10
+    blt  a1, t0, watch_end       # if a1 < 10 → done
+
+    # -------------------------------------------------
+    # rollover minutes ones → increment minutes tens
+    # -------------------------------------------------
+    li   a1, 0
+    addi a0, a0, 1
+    li   t1, 6
+    blt  a0, t1, watch_end       # if a0 < 6 → done
+
+    # -------------------------------------------------
+    # Rollover from 59:59.99 → 00:00.00
+    # -------------------------------------------------
+    li   a0, 0
+
+watch_end:
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw ra, 8(sp)
+    addi sp, sp, 12
+
+    ret
+# -----------------------------------------------------
+# Function: Read SW
+# Purpose : Read SW
+# Inputs  : a0 = SW address
+# Outputs : a0 = Stop
+#           a1 = Reset
+# -----------------------------------------------------
+read_sw:
+    # Allocate stack (12 bytes)
+    addi sp, sp, -12
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw ra, 8(sp)
+    
+    mv t0, a0
+    lw t1, 0(t0)
+    mv a0, t1
+    andi a0, a0, 0x1
+    mv a1, t1
+    srli a1, a1, 1
+    andi a1, a1, 0x1
+
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    sw ra, 8(sp)
+    addi sp, sp, 12
+    ret
+
+# -----------------------------------------------------
+# Function: delay_ms(a0)
+# Purpose : delay
+# Inputs  : a0 = ms
+# -----------------------------------------------------
+delay_ms:
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw ra, 12(sp)
+
+    li t0, 0
+    li t1, 25000
+    li t2, 0
+delay_ms_loop:
+    addi t0, t0, 1
+    blt t0, t1, delay_ms_loop
+
+    li t0, 0
+    addi t2, t2, 1
+    blt t2, a0, delay_ms_loop
+
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
+
+    ret
+# -----------------------------------------------------
+# Function: delay_us(a0)
+# Purpose : delay
+# Inputs  : a0 = us
+# -----------------------------------------------------
+delay_us:
+    # Allocate stack (16 bytes)
+    addi sp, sp, -16
+    sw t0, 0(sp)
+    sw t1, 4(sp)
+    sw t2, 8(sp)
+    sw ra, 12(sp)
+
+    li t0, 0
+    li t1, 25
+    li t2, 0
+delay_us_loop:
+    addi t0, t0, 1
+    blt t0, t1, delay_us_loop
+
+    li t0, 0
+    addi t2, t2, 1
+    blt t2, a0, delay_us_loop
+
+    # Restore registers
+    lw t0, 0(sp)
+    lw t1, 4(sp)
+    lw t2, 8(sp)
+    lw ra, 12(sp)
+    addi sp, sp, 16
+
+    ret
