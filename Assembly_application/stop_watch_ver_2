@@ -30,16 +30,16 @@ loop:
     lw a1, 4(s0)           # Minutes one
     lw a2, 8(s0)           # Seconds ten
     lw a3, 12(s0)          # Seconds one
-    lw a4, 16(t0)
-    lw a5, 20(t0)
+    lw a4, 16(s0)
+    lw a5, 20(s0)
     jal ra, watch_run
     li t0, 0x00000040
     sw a0, 0(s0)
     sw a1, 4(s0)
     sw a2, 8(s0)
     sw a3, 12(s0)
-    lw a4, 16(t0)
-    lw a5, 20(t0)
+    lw a4, 16(s0)
+    lw a5, 20(s0)
 
     j loop
 
