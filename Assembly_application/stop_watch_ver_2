@@ -15,8 +15,8 @@ loop:
     lw a1, 4(s0)
     lw a2, 8(s0)
     lw a3, 12(s0)
-    lw a4, 16(t0)
-    lw a5, 20(t0)
+    lw a4, 16(s0)
+    lw a5, 20(s0)
     jal ra, hex_led_display
 
     li a0, 0x10010000
