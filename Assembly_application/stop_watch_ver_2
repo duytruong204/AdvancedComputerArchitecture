@@ -127,7 +127,7 @@ hex_led_display:
     sw ra,  16(sp)
 
     # Load digit pattern table base address
-    li  t4, DIGIT_PATTERN_TABLE        # <-- update this constant
+    li  t4, 0x00000040        # <-- update this constant
     li  t5, 0                           # accumulator
 
     # ======================================================
