@@ -1,0 +1,31 @@
+module branch_taken (
+    input  wire [31:0]	i_inst,
+	input  wire			i_br_lt, i_br_eq,
+	output wire 		o_br_un, 			//0: Signed; 1: Unsigned
+	output wire 		o_pc_sel 			// 0: +4 ; 	1: ALU
+);
+	wire [2:0]	w_funct3 = i_inst[14:12];
+	wire [4:0] 	w_opcode = i_inst[6:2];
+
+    wire w_jalr     =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] &  w_opcode[0]; // 11001
+	wire w_jal      =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] &  w_opcode[1] &  w_opcode[0]; // 11011
+    wire w_branch   =  w_opcode[4] &  w_opcode[3] & ~w_opcode[2] & ~w_opcode[1] & ~w_opcode[0]; // 11000
+    wire w_beq      = ~w_funct3[2] & ~w_funct3[1] & ~w_funct3[0];
+	wire w_bne      = ~w_funct3[2] & ~w_funct3[1] &  w_funct3[0];
+	wire w_blt      =  w_funct3[2] & ~w_funct3[1] & ~w_funct3[0];
+	wire w_bge      =  w_funct3[2] & ~w_funct3[1] &  w_funct3[0];
+	wire w_bltu     =  w_funct3[2] &  w_funct3[1] & ~w_funct3[0];
+	wire w_bgeu     =  w_funct3[2] &  w_funct3[1] &  w_funct3[0];
+	 
+	assign o_pc_sel = w_branch & (
+			(w_beq  &  i_br_eq) |
+			(w_bne  & ~i_br_eq) |
+			(w_blt  &  i_br_lt) |
+			(w_bge  & ~i_br_lt) |
+			(w_bltu &  i_br_lt) |
+			(w_bgeu & ~i_br_lt)
+				) | w_jal | w_jalr;
+    
+    assign o_br_un = w_branch & (w_bltu | w_bgeu);
+
+endmodule

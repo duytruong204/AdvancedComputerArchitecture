@@ -1,0 +1,319 @@
+module pipelined (
+	input  wire 		i_clk,
+	input  wire 		i_reset,
+	input  wire	[31:0]	i_io_sw,
+	output wire	[31:0]	o_io_lcd,
+	output wire	[31:0] 	o_io_ledg,
+	output wire	[31:0] 	o_io_ledr,
+	output wire	[6:0]  	o_io_hex0,
+	output wire	[6:0]  	o_io_hex1,
+	output wire	[6:0]  	o_io_hex2,
+	output wire	[6:0]  	o_io_hex3,
+	output wire	[6:0]  	o_io_hex4,
+	output wire	[6:0]  	o_io_hex5,
+	output wire	[6:0]  	o_io_hex6,
+	output wire	[6:0]  	o_io_hex7,
+	output wire [31:0] 	o_pc_debug,
+	output wire 		o_insn_vld,
+	output wire 		o_mispred,
+	output wire 		o_ctrl
+);
+	wire        w_pc_stall, w_IF_ID_stall, w_ID_EX_stall, w_EX_MEM_stall, w_MEM_WB_stall;
+	wire 	                w_IF_ID_flush, w_ID_EX_flush, w_EX_MEM_flush, w_MEM_WB_flush;
+	// PCs and Instructions
+	wire [31:0] w_IF_pc, w_ID_pc, w_EX_pc, w_MEM_pc, w_WB_pc;
+	wire [31:0] w_IF_pc_4, w_WB_pc_4;
+	wire [31:0] w_pc_new;
+	wire [31:0] w_IF_inst, w_ID_inst, w_EX_inst, w_MEM_inst, w_WB_inst;
+	//Control logic
+	wire 		w_ID_rd_wren, w_EX_rd_wren, w_MEM_rd_wren, w_WB_rd_wren;
+	wire [4:0]	w_imm_sel;
+	wire 		w_ID_br_un, w_EX_br_un;
+	wire 		w_br_lt;
+	wire		w_br_eq;
+	wire		w_ID_opa_sel, w_EX_opa_sel;
+	wire		w_ID_opb_sel, w_EX_opb_sel;
+	wire [3:0]	w_ID_alu_op, w_EX_alu_op;
+	wire 		w_ID_pc_sel, w_EX_pc_sel, w_MEM_pc_sel, w_WB_pc_sel;
+	wire [2:0]	w_ID_type_access, w_EX_type_access, w_MEM_type_access;
+	wire		w_ID_mem_rw, w_EX_mem_rw, w_MEM_mem_rw;
+	wire [1:0]	w_ID_wb_sel, w_EX_wb_sel, w_MEM_wb_sel, w_WB_wb_sel;
+	// Reg file
+	wire [4:0]  w_ID_rs1_addr, w_EX_rs1_addr, w_MEM_rs1_addr, w_WB_rs1_addr;
+	wire [4:0]  w_ID_rs2_addr, w_EX_rs2_addr, w_MEM_rs2_addr, w_WB_rs2_addr;
+	wire [4:0]  w_ID_rd_addr, w_EX_rd_addr, w_MEM_rd_addr, w_WB_rd_addr;
+	wire [31:0] w_ID_rs1_data, w_EX_rs1_data;
+	wire [31:0] w_ID_rs2_data, w_EX_rs2_data, w_MEM_rs2_data;
+	wire [31:0] w_WB_rd_data;
+	wire [31:0] w_ID_imm, w_EX_imm;
+	// ALU
+	wire [31:0] w_op_a;
+	wire [31:0] w_op_b;
+	wire [31:0] w_EX_alu_data, w_MEM_alu_data, w_WB_alu_data;
+	//LSU
+	wire [31:0] w_MEM_ld_data, w_WB_ld_data;
+
+	wire w_ID_insn_vld, w_EX_insn_vld, w_MEM_insn_vld, w_WB_insn_vld;
+	//===============================================================
+	// IF Stage
+	//===============================================================
+	mux_2to1_32bit mux_pc_sel (
+		.i_in0(w_IF_pc_4),
+		.i_in1(w_EX_alu_data),
+		.i_sel(w_EX_pc_sel),
+		.o_out(w_pc_new)
+	);
+
+	pc pc(
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		.i_stall(w_pc_stall),
+		.i_pc(w_pc_new),
+		.o_pc(w_IF_pc)
+	);
+	
+	full_adder_32bit add_1(
+		.i_a(32'b100),
+		.i_b(w_IF_pc),
+		.i_carry(1'b0),
+		.o_sum(w_IF_pc_4),
+		.o_carry()
+	);
+
+	inst_mem #(.N(2048)) inst_mem(
+		.i_addr_inst(w_IF_pc), 
+		.o_inst(w_IF_inst)
+	);
+
+	IF_ID_reg IF_ID_reg(
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		.i_stall(w_IF_ID_stall),
+		.i_flush(w_IF_ID_flush),
+		.i_pc(w_IF_pc), .o_pc(w_ID_pc),
+		.i_inst(w_IF_inst), .o_inst(w_ID_inst)
+	);
+
+	//===============================================================
+	// ID Stage
+	//===============================================================
+	assign w_ID_rd_addr = w_ID_inst[11:7];
+	assign w_ID_rs1_addr = w_ID_inst[19:15];
+	assign w_ID_rs2_addr = w_ID_inst[24:20];
+
+	regfile regfile(
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		.i_rd_addr(w_WB_rd_addr),
+		.i_rs1_addr(w_ID_rs1_addr),
+		.i_rs2_addr(w_ID_rs2_addr),
+		.i_rd_data(w_WB_rd_data),
+		.i_rd_wren(w_WB_rd_wren),
+		.o_rs1_data(w_ID_rs1_data),
+		.o_rs2_data(w_ID_rs2_data)
+	);
+	
+	imm_gen imm_gen(
+		.i_inst(w_ID_inst[31:7]),
+		.i_imm_sel(w_imm_sel),
+		.o_imm(w_ID_imm)
+	);
+
+	control_logic control_logic(
+		.i_inst(w_ID_inst),
+		//.i_br_lt(w_br_lt),
+		//.i_br_eq(w_br_eq),
+		//.o_br_un(w_ID_br_un),
+		//.o_pc_sel(w_ID_pc_sel),
+		.o_imm_sel(w_imm_sel),
+		.o_rd_wren(w_ID_rd_wren),
+		.o_insn_vld(w_ID_insn_vld),
+		.o_opa_sel(w_ID_opa_sel),
+		.o_opb_sel(w_ID_opb_sel),
+		.o_alu_op(w_ID_alu_op),
+		.o_type_access(w_ID_type_access),
+		.o_mem_rw(w_ID_mem_rw),
+		.o_wb_sel(w_ID_wb_sel)
+	);
+
+	ID_EX_reg ID_EX_reg(
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		.i_stall(w_ID_EX_stall),
+		.i_flush(w_ID_EX_flush),
+		.i_pc(w_ID_pc), .o_pc(w_EX_pc),
+		.i_inst(w_ID_inst), .o_inst(w_EX_inst),
+		.i_rs1_addr(w_ID_rs1_addr), .o_rs1_addr(w_EX_rs1_addr),
+		.i_rs2_addr(w_ID_rs2_addr), .o_rs2_addr(w_EX_rs2_addr),
+		.i_rd_addr(w_ID_rd_addr), .o_rd_addr(w_EX_rd_addr),
+		.i_rs1_data(w_ID_rs1_data), .o_rs1_data(w_EX_rs1_data),
+		.i_rs2_data(w_ID_rs2_data), .o_rs2_data(w_EX_rs2_data),
+		.i_imm(w_ID_imm), .o_imm(w_EX_imm),
+		.i_op_a_sel(w_ID_opa_sel), .o_op_a_sel(w_EX_opa_sel),
+		.i_op_b_sel(w_ID_opb_sel), .o_op_b_sel(w_EX_opb_sel),
+		.i_alu_op(w_ID_alu_op), .o_alu_op(w_EX_alu_op),
+		//.i_br_un(w_ID_br_un), .o_br_un(w_EX_br_un),
+		.i_mem_rw(w_ID_mem_rw), .o_mem_rw(w_EX_mem_rw),
+		.i_type_access(w_ID_type_access), .o_type_access(w_EX_type_access),
+		.i_wb_sel(w_ID_wb_sel), .o_wb_sel(w_EX_wb_sel),
+		.i_rd_wren(w_ID_rd_wren), .o_rd_wren(w_EX_rd_wren),
+		.i_insn_vld(w_ID_insn_vld), .o_insn_vld(w_EX_insn_vld)
+	);
+
+	//===============================================================
+	// EX Stage
+	//===============================================================
+	brc brc(
+		.i_rs1_data(w_EX_rs1_data),
+		.i_rs2_data(w_EX_rs2_data),
+		.i_br_un(w_EX_br_un),
+		.o_br_less(w_br_lt),
+		.o_br_equal(w_br_eq)
+	);
+
+	mux_2to1_32bit mux_a_sel(
+		.i_in0(w_EX_rs1_data),
+		.i_in1(w_EX_pc),
+		.i_sel(w_EX_opa_sel),
+		.o_out(w_op_a)
+	);
+
+	mux_2to1_32bit mux_b_sel (
+		.i_in0(w_EX_rs2_data),
+		.i_in1(w_EX_imm),
+		.i_sel(w_EX_opb_sel),
+		.o_out(w_op_b)
+	);
+
+	alu alu (
+		.i_op_a(w_op_a),
+		.i_op_b(w_op_b),
+		.i_alu_op(w_EX_alu_op),
+		.o_alu_data(w_EX_alu_data)
+	);
+
+	branch_taken branch_taken (
+		.i_inst(w_EX_inst),
+		.i_br_lt(w_br_lt),
+		.i_br_eq(w_br_eq),
+		.o_br_un(w_EX_br_un),
+		.o_pc_sel(w_EX_pc_sel)
+	);
+
+	EX_MEM_reg EX_MEM_reg(
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		.i_stall(w_EX_MEM_stall),
+		.i_flush(w_EX_MEM_flush),
+		.i_pc(w_EX_pc), .o_pc(w_MEM_pc),
+		.i_inst(w_EX_inst), .o_inst(w_MEM_inst),
+		.i_rs1_addr(w_EX_rs1_addr), .o_rs1_addr(w_MEM_rs1_addr),
+		.i_rs2_addr(w_EX_rs2_addr), .o_rs2_addr(w_MEM_rs2_addr),
+		.i_rd_addr(w_EX_rd_addr), .o_rd_addr(w_MEM_rd_addr),
+		.i_alu_data(w_EX_alu_data), .o_alu_data(w_MEM_alu_data),
+		.i_rs2_data(w_EX_rs2_data), .o_rs2_data(w_MEM_rs2_data),
+		.i_mem_rw(w_EX_mem_rw), .o_mem_rw(w_MEM_mem_rw),
+		.i_type_access(w_EX_type_access), .o_type_access(w_MEM_type_access),
+		.i_wb_sel(w_EX_wb_sel), .o_wb_sel(w_MEM_wb_sel),
+		.i_rd_wren(w_EX_rd_wren), .o_rd_wren(w_MEM_rd_wren),
+		.i_insn_vld(w_EX_insn_vld), .o_insn_vld(w_MEM_insn_vld),
+		.i_pc_sel(w_EX_pc_sel), .o_pc_sel(w_MEM_pc_sel)
+	);
+	//===============================================================
+	// MEM Stage
+	//===============================================================
+	lsu lsu(
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		.i_type_access(w_MEM_type_access),
+		.i_lsu_addr(w_MEM_alu_data),
+		.i_st_data(w_MEM_rs2_data),
+		.i_lsu_wren(w_MEM_mem_rw),
+		.o_ld_data(w_MEM_ld_data),
+		.i_io_sw(i_io_sw),
+		.o_io_lcd(o_io_lcd),
+		.o_io_ledg(o_io_ledg),
+		.o_io_ledr(o_io_ledr),
+		.o_io_hex0(o_io_hex0),
+		.o_io_hex1(o_io_hex1),
+		.o_io_hex2(o_io_hex2),
+		.o_io_hex3(o_io_hex3),
+		.o_io_hex4(o_io_hex4),
+		.o_io_hex5(o_io_hex5),
+		.o_io_hex6(o_io_hex6),
+		.o_io_hex7(o_io_hex7)
+	);
+	MEM_WB_reg MEM_WB_reg(
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		.i_stall(w_MEM_WB_stall),
+		.i_flush(w_MEM_WB_flush),
+		.i_pc(w_MEM_pc), .o_pc(w_WB_pc),
+		.i_inst(w_MEM_inst), .o_inst(w_WB_inst),
+		.i_rd_addr(w_MEM_rd_addr), .o_rd_addr(w_WB_rd_addr),
+		.i_alu_data(w_MEM_alu_data), .o_alu_data(w_WB_alu_data),
+		.i_ld_data(w_MEM_ld_data), .o_ld_data(w_WB_ld_data),
+		.i_wb_sel(w_MEM_wb_sel), .o_wb_sel(w_WB_wb_sel),
+		.i_rd_wren(w_MEM_rd_wren), .o_rd_wren(w_WB_rd_wren),
+		.i_insn_vld(w_MEM_insn_vld), .o_insn_vld(w_WB_insn_vld),
+		.i_pc_sel(w_MEM_pc_sel), .o_pc_sel(w_WB_pc_sel)
+	);
+	//===============================================================
+	// WB Stage
+	//===============================================================
+
+	full_adder_32bit add_2(
+		.i_a(32'b100),
+		.i_b(w_WB_pc),
+		.i_carry(1'b0),
+		.o_sum(w_WB_pc_4),
+		.o_carry()
+	);
+	
+	mux_4to1_32bit mux_wb_sel (
+		.i_in0(w_WB_ld_data),
+		.i_in1(w_WB_alu_data),
+		.i_in2(w_WB_pc_4),
+		.i_in3(32'b0),
+		.i_sel(w_WB_wb_sel),
+		.o_out(w_WB_rd_data)
+	);
+	assign o_pc_debug = w_WB_pc;
+	assign o_insn_vld = w_WB_insn_vld;
+	assign o_ctrl = w_WB_pc_sel;
+	assign o_mispred = w_IF_ID_flush | w_ID_EX_flush | w_EX_MEM_flush | w_MEM_WB_flush;
+	//===============================================================
+	// Hazard Detection Unit
+	//===============================================================
+	hazard_detector hazard_detector (
+		.i_clk(i_clk),
+		.i_reset(i_reset),
+		// ID stage
+		.i_ID_rs1_addr(w_ID_rs1_addr),
+		.i_ID_rs2_addr(w_ID_rs2_addr),
+		// EX stage
+		.i_EX_rs1_addr(w_EX_rs1_addr),
+		.i_EX_rs2_addr(w_EX_rs2_addr),
+		.i_EX_rd_wren(w_EX_rd_wren),
+		.i_EX_rd_addr(w_EX_rd_addr),
+		.i_EX_pc_sel(w_EX_pc_sel),
+		// MEM stage
+		.i_MEM_rd_addr(w_MEM_rd_addr),
+		.i_MEM_rd_wren(w_MEM_rd_wren),
+		.i_MEM_inst(w_MEM_inst),
+		// WB stage
+		.i_WB_rd_wren(w_WB_rd_wren),
+		.i_WB_rd_addr(w_WB_rd_addr),
+		// Outputs
+		.o_pc_stall(w_pc_stall),
+		.o_IF_ID_stall(w_IF_ID_stall),
+		.o_IF_ID_flush(w_IF_ID_flush),
+		.o_ID_EX_stall(w_ID_EX_stall),
+		.o_ID_EX_flush(w_ID_EX_flush),
+		.o_EX_MEM_stall(w_EX_MEM_stall),
+		.o_EX_MEM_flush(w_EX_MEM_flush),
+		.o_MEM_WB_stall(w_MEM_WB_stall),
+		.o_MEM_WB_flush(w_MEM_WB_flush)
+	);
+
+endmodule
