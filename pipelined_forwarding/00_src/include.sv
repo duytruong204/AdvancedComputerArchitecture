@@ -46,7 +46,6 @@
 `include "D:/Application/altera/13.0sp1/Project/Pipeline_RISC_V/pipelined_forwarding/00_src/02_pipelined_regs/ID_EX_reg.sv"
 `include "D:/Application/altera/13.0sp1/Project/Pipeline_RISC_V/pipelined_forwarding/00_src/02_pipelined_regs/EX_MEM_reg.sv"
 `include "D:/Application/altera/13.0sp1/Project/Pipeline_RISC_V/pipelined_forwarding/00_src/02_pipelined_regs/MEM_WB_reg.sv"
-`include "D:/Application/altera/13.0sp1/Project/Pipeline_RISC_V/pipelined_forwarding/00_src/02_pipelined_regs/WB_Extra_reg.sv"
 // pipelined control
 `include "D:/Application/altera/13.0sp1/Project/Pipeline_RISC_V/pipelined_forwarding/00_src/03_pipelined_control/branch_taken.sv"
 `include "D:/Application/altera/13.0sp1/Project/Pipeline_RISC_V/pipelined_forwarding/00_src/03_pipelined_control/stall_flush_unit.sv"
