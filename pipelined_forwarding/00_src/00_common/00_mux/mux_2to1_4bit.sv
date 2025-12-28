@@ -1,0 +1,21 @@
+//Mux 2 input 4 bit
+// mux_2to1_4bit
+// 4-bit 2-to-1 multiplexer: selects between i_in0 and i_in1 based on i_sel
+module mux_2to1_4bit (
+	input  wire [3:0] i_in0,   // Input 0 (4 bit)
+	input  wire [3:0] i_in1,   // Input 1 (4 bit)
+	input  wire       i_sel,   // Select line
+	output wire [3:0] o_out    // Output (4 bit)
+);
+	genvar i;
+	generate
+		for(i=0; i < 4; i = i +1) begin: mux_array
+           		 mux_2to1_1bit mux (
+                		.i_in0(i_in0[i]),
+                		.i_in1(i_in1[i]),
+                		.i_sel(i_sel),
+                		.o_out(o_out[i])
+            		);
+		end
+	endgenerate
+endmodule
